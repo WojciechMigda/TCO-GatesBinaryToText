@@ -2,6 +2,7 @@
 // pdraghicescu@pnri.org
 //
 
+#include "program_options.h"
 #include "run.h"
 #include "string.h"
 
