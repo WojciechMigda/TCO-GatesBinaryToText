@@ -2,12 +2,13 @@
 // pdraghicescu@pnri.org
 //
 
+#include "run.h"
+#include "string.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <values.h>
 
-#include "run.h"
-#include "string.h"
 
 #ifdef DELTA_PREC
 #define PRINT_PRC_D "%.10Lf%c"
@@ -15,9 +16,16 @@
 #define PRINT_PRC_D "%.10lf%c"
 #endif
 
+
 // write all tuples above cutoff
-unsigned long count_tuples_bin_cutoff(const option_t* opt, FILE* fbin, int d,
-    double cutoff, long unsigned n_tuples, double average, double std)
+unsigned long count_tuples_bin_cutoff(
+    const option_t* opt,
+    FILE* fbin,
+    int d,
+    double cutoff,
+    long unsigned n_tuples,
+    double average,
+    double std)
 {
     double next;
     unsigned long c = 0;
@@ -68,6 +76,7 @@ unsigned long count_tuples_bin_cutoff(const option_t* opt, FILE* fbin, int d,
 
     return c;
 }
+
 
 // calculate standard deviation, min and max delta
 double calculate_std_bin(
@@ -125,6 +134,7 @@ double calculate_std_bin(
     return sqrtl(result);
 }
 
+
 // read and store header information
 int get_header(
     FILE* fbin,
@@ -175,18 +185,10 @@ int get_header(
 
 
 // main function
-int run(option_t *opt)
+int run(const option_t *opt)
 {
     FILE* fbin1;
     FILE* fbin2;
-    double average = 0.0;
-    double std = 0.0;
-    double cutoff;
-    int d;
-    int n_vars;
-    int sign = 1;
-    unsigned long n_tuples;
-    unsigned long c;
 
     // open output file, get dimension and other information from header
     fbin1 = fopen(opt->in_file1, "rb");
@@ -220,6 +222,12 @@ int run(option_t *opt)
     rewind(fbin1);
     rewind(fbin2);
 
+
+    int d;
+    int n_vars;
+    double average = 0.0;
+    unsigned long n_tuples;
+
     get_header(fbin1, &d, &n_vars, &n_tuples, &average);
     if (fclose(fbin1) != 0)
     {
@@ -227,7 +235,7 @@ int run(option_t *opt)
         return -1;
     }
 
-    sign = pow(-1, d);
+    const int sign = pow(-1, d);
 
     fprintf(stderr, "Dimension:\t\t%d\n", d);
     fprintf(stderr, "Number of Variables:\t%d\n", n_vars);
@@ -237,14 +245,16 @@ int run(option_t *opt)
     // if -s is passed, pass through the file once to calculate std, and again to create out5.txt
     if (opt->s_option)
     {
-        std = calculate_std_bin(fbin2, average, d, n_tuples + 1);
+        const double std = calculate_std_bin(fbin2, average, d, n_tuples + 1);
         rewind(fbin2);
-        cutoff = average + sign * std * opt->s_std;
+
+        const double cutoff = average + sign * std * opt->s_std;
+
         fprintf(stderr, "St. Dev.:\t\t%.10f\n", std);
         fprintf(stderr, "Cutoff:\t\t\t%.10f\n", cutoff);
 
         // count and print tuples above cutoff
-        c = count_tuples_bin_cutoff(opt, fbin2, d, cutoff, n_tuples + 1, average, std);
+        const unsigned long c = count_tuples_bin_cutoff(opt, fbin2, d, cutoff, n_tuples + 1, average, std);
         fprintf(stderr, "Tuples Above Cutoff:\t%ld\t(%.2f%%)\n", c, 100.0 * c / n_tuples);
     }
 
