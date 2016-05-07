@@ -35,11 +35,5 @@ int parse_args(
     char const * argv[],
     option_t * opt);
 
-DEFINE_PAIR(int, program_options_t);
-
-PAIR(int, program_options_t) parse_program_options(
-    int argc,
-    char const * argv[]);
-
 
 #endif /* PROGRAM_OPTIONS_H_ */

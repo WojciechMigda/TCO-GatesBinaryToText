@@ -4,7 +4,7 @@
  * Distributed under the terms of the GNU LGPL v3
  *******************************************************************************
  *
- * Filename: pair.h
+ * Filename: data_context.h
  *
  * Description:
  *      description
@@ -22,8 +22,10 @@
  ******************************************************************************/
 
 
-#ifndef PAIR_H_
-#define PAIR_H_
+#ifndef DATA_CONTEXT_H_
+#define DATA_CONTEXT_H_
+
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -31,23 +33,18 @@ extern "C"
 #endif
 
 
-#define DEFINE_PAIR(_Tp1, _Tp2) \
-typedef struct pair_##_Tp1##_##_Tp2##_s \
-{ \
-    _Tp1 first; \
-    _Tp2 second; \
-} pair_##_Tp1##_##_Tp2##_t
-
-
-#define PAIR(_Tp1, _Tp2) struct pair_##_Tp1##_##_Tp2##_s
-
-#define PAIR_T(_Tp1, _Tp2) struct pair_##_Tp1##_##_Tp2##_t
-
-#define MAKE_PAIR(_Tp1, _Tp2, p, q) (PAIR(_Tp1, _Tp2)){p, q}
+typedef struct __attribute__ ((__packed__)) data_context_s
+{
+    uint32_t dummy;
+    uint32_t d; /* tuple dimension */
+    uint32_t n_vars;
+    uint64_t n_tuples;
+    double average;
+} data_context_t;
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PAIR_H_ */
+#endif /* DATA_CONTEXT_H_ */

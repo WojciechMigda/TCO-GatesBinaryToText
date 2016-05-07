@@ -4,8 +4,8 @@
 
 #include "program_options.h"
 #include "run.h"
-#include "string.h"
 
+#include <string.h>
 #include <math.h>
 #include <stdio.h>
 #include <values.h>

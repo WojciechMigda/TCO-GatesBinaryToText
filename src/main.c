@@ -5,7 +5,11 @@
 // 4/6/2015
 //
 
+#include "parse_program_options.h"
 #include "program_options.h"
+#include "pair.h"
+#include "work.h"
+
 #include "run.h"
 
 #include <stdio.h>
@@ -27,6 +31,30 @@ int init_options(option_t *opt)
 
 int main(int argc, char const * argv[])
 {
+    PAIR(int, program_options_t) program_options_ret = parse_program_options(argc, argv);
+
+    if (program_options_ret.first < 0)
+    {
+        return 1;
+    }
+
+    const time_t ltime = time(NULL);
+    fprintf(stderr, "%s", asctime(localtime(&ltime)));
+
+
+    const int work_ret = work(&program_options_ret.second);
+    if (work_ret < 0)
+    {
+        fprintf(stderr, "Error running.\n");
+        return 1;
+    }
+
+    fprintf(stderr, "Finished Succesfully.\n");
+
+    return 0;
+
+    ////////////////////////////////////////////////////////////////////////////
+
     int err;
     option_t opt;
 
@@ -44,15 +72,8 @@ int main(int argc, char const * argv[])
         return 1;
     }
 
-    //TODO: remove this, implement these options
-    if ((opt.n != 0) || (opt.k != 0) || (opt.b != 0))
-    {
-        fprintf(stderr, "WARNING: -n, -k, -b not yet implemented!\n");
-        //return 1;
-    }
-
-    const time_t ltime = time(NULL);
-    fprintf(stderr, "%s", asctime(localtime(&ltime)));
+//    const time_t ltime = time(NULL);
+//    fprintf(stderr, "%s", asctime(localtime(&ltime)));
 
     err = run(&opt);
     if (err < 0)

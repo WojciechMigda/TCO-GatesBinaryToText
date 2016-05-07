@@ -1,3 +1,4 @@
+#include "parse_program_options.h"
 #include "program_options.h"
 #include "bool.h"
 #include "pair.h"
