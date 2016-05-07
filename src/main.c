@@ -129,7 +129,7 @@ int main(int argc, char * argv[])
         //return 1;
     }
 
-    ltime = time(NULL );
+    ltime = time(NULL);
     fprintf(stderr, "%s", asctime(localtime(&ltime)));
 
     err = run(&opt);
@@ -143,4 +143,3 @@ int main(int argc, char * argv[])
 
     return 0;
 }
-

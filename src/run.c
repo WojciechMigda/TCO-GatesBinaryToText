@@ -21,11 +21,11 @@ unsigned long count_tuples_bin_cutoff(const option_t* opt, FILE* fbin, int d,
 {
     double next;
     unsigned long c = 0;
-    int skip = d + sizeof(double) / sizeof(int);
+    int skip = d + sizeof (double) / sizeof (int);
     int i;
     int j;
     int *ip;
-    int bufsize = (d * TUP_BUF_SIZE) + ((sizeof(double) / sizeof(int)) * TUP_BUF_SIZE);
+    int bufsize = (d * TUP_BUF_SIZE) + ((sizeof (double) / sizeof (int)) * TUP_BUF_SIZE);
     int buffer[bufsize];
     unsigned int n;
 
@@ -39,7 +39,7 @@ unsigned long count_tuples_bin_cutoff(const option_t* opt, FILE* fbin, int d,
 
     while (n_tuples > 0)
     {
-        n = fread(buffer, sizeof(int), bufsize, fbin);
+        n = fread(buffer, sizeof (int), bufsize, fbin);
         if (!n)
         {
             break;
@@ -47,7 +47,7 @@ unsigned long count_tuples_bin_cutoff(const option_t* opt, FILE* fbin, int d,
 
         for (j = 0; (j < n) && (--n_tuples > 0); j += skip)
         {
-            memcpy(&next, &buffer[j + d], sizeof(double));
+            memcpy(&next, &buffer[j + d], sizeof (double));
 
             // if next score is in the tail
             if ((!(d % 2) && (next >= cutoff)) || ((d % 2) && (next <= cutoff)))
@@ -82,16 +82,16 @@ double calculate_std_bin(
     double result;
     double min = DBL_MAX;
     double max = -DBL_MAX;
-    int skip = d + sizeof(double) / sizeof(int);
+    int skip = d + sizeof (double) / sizeof (int);
     int j;
     // TODO: hard code types for different values of d
-    int bufsize = (d * TUP_BUF_SIZE) + ((sizeof(double) / sizeof(int)) * TUP_BUF_SIZE);
+    int bufsize = (d * TUP_BUF_SIZE) + ((sizeof (double) / sizeof (int)) * TUP_BUF_SIZE);
     int buffer[bufsize];
     unsigned int n;
 
     while (n_tuples > 0)
     {
-        n = fread(buffer, sizeof(int), bufsize, fbin);
+        n = fread(buffer, sizeof (int), bufsize, fbin);
 
         if (!n)
         {
@@ -100,7 +100,7 @@ double calculate_std_bin(
 
         for (j = 0; (j < n) && (--n_tuples > 0); j += skip)
         {
-            memcpy(&next, &buffer[j + d], sizeof(double));
+            memcpy(&next, &buffer[j + d], sizeof (double));
             if (next < min)
             {
                 min = next;
@@ -114,10 +114,12 @@ double calculate_std_bin(
             c++;
         }
     }
+
     fprintf(stderr, "Min Delta:\t\t");
     fprintf(stderr, PRINT_PRC_D, min, '\n');
     fprintf(stderr, "Max Delta:\t\t");
     fprintf(stderr, PRINT_PRC_D, max, '\n');
+
     result = sum / c;
 
     return sqrtl(result);
@@ -133,35 +135,35 @@ int get_header(
 {
     int err;
 
-    err = fread(d, 1, sizeof(int), fbin);
+    err = fread(d, 1, sizeof (int), fbin);
     if (!err)
     {
         fprintf(stderr, "Error: couldn't read dummy 0 from file\n");
         return -1;
     }
 
-    err = fread(d, 1, sizeof(int), fbin);
+    err = fread(d, 1, sizeof (int), fbin);
     if (!err)
     {
         fprintf(stderr, "Error: couldn't read dimension from file\n");
         return -1;
     }
 
-    err = fread(n_vars, 1, sizeof(int), fbin);
+    err = fread(n_vars, 1, sizeof (int), fbin);
     if (!err)
     {
         fprintf(stderr, "Error: couldn't read n_vars from file\n");
         return -1;
     }
 
-    err = fread(n_tuples, 1, sizeof(unsigned long), fbin);
+    err = fread(n_tuples, 1, sizeof (unsigned long), fbin);
     if (!err)
     {
         fprintf(stderr, "Error: couldn't read n_tuples from file\n");
         return -1;
     }
 
-    err = fread(average, 1, sizeof(double), fbin);
+    err = fread(average, 1, sizeof (double), fbin);
     if (!err)
     {
         fprintf(stderr, "Error: couldn't read average from file\n");
