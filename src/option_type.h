@@ -45,6 +45,10 @@ typedef struct optional_##_Tp##_s \
 
 #define OPTION_TYPE_VALUE(what) (what.value)
 
+#define OPTION_TYPE_NONE(_Tp) (OPTION_TYPE(_Tp)){False}
+
+#define OPTION_TYPE_SOME(_Tp, Value) (OPTION_TYPE(_Tp)){True, Value}
+
 #ifdef __cplusplus
 }
 #endif

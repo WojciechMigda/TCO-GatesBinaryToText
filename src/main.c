@@ -25,10 +25,9 @@ int init_options(option_t *opt)
     return 0;
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char const * argv[])
 {
     int err;
-    time_t ltime;
     option_t opt;
 
     err = init_options(&opt);
@@ -52,7 +51,7 @@ int main(int argc, char * argv[])
         //return 1;
     }
 
-    ltime = time(NULL);
+    const time_t ltime = time(NULL);
     fprintf(stderr, "%s", asctime(localtime(&ltime)));
 
     err = run(&opt);

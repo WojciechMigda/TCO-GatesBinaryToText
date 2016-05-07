@@ -14,6 +14,7 @@ typedef struct option_s
 } option_t;
 
 #include "option_type.h"
+#include "pair.h"
 #include <stdint.h>
 
 DEFINE_OPTION_TYPE(double);
@@ -27,6 +28,18 @@ typedef struct program_options_s
     const char * in_file1;
     const char * in_file2;
 } program_options_t;
+
+
+int parse_args(
+    int argc,
+    char const * argv[],
+    option_t * opt);
+
+DEFINE_PAIR(int, program_options_t);
+
+PAIR(int, program_options_t) parse_program_options(
+    int argc,
+    char const * argv[]);
 
 
 #endif /* PROGRAM_OPTIONS_H_ */
