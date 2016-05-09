@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2016 Wojciech Migda
  * All rights reserved
- * Distributed under the terms of the GNU LGPL v3
+ * Distributed under the terms of the MIT License
  *******************************************************************************
  *
  * Filename: read_scored_tuples.h
@@ -35,8 +35,11 @@ extern "C"
 
 DEFINE_SPAN(void);
 
-SPAN(void) read_scored_tuples(const char * fname);
-int release_scored_tuples(SPAN(void) span);
+SPAN(void) read_scored_tuples_mmap(const char * fname);
+int release_scored_tuples_mmap(SPAN(void) span);
+
+SPAN(void) read_scored_tuples_malloc(const char * fname);
+int release_scored_tuples_malloc(SPAN(void) span);
 
 
 #ifdef __cplusplus

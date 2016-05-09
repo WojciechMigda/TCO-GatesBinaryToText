@@ -4,7 +4,7 @@
  * Distributed under the terms of the MIT License
  *******************************************************************************
  *
- * Filename: pair.h
+ * Filename: io.h
  *
  * Description:
  *      description
@@ -17,13 +17,16 @@
  * --------
  * Date         Who  Ticket     Description
  * ----------   ---  ---------  ------------------------------------------------
- * 2016-05-07   wm              Initial version
+ * 2016-05-09   wm              Initial version
  *
  ******************************************************************************/
 
 
-#ifndef PAIR_H_
-#define PAIR_H_
+#ifndef IO_H_
+#define IO_H_
+
+#include <stddef.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -31,23 +34,11 @@ extern "C"
 #endif
 
 
-#define DEFINE_PAIR(_Tp1, _Tp2) \
-typedef struct pair_##_Tp1##_##_Tp2##_s \
-{ \
-    _Tp1 first; \
-    _Tp2 second; \
-} pair_##_Tp1##_##_Tp2##_t
-
-
-#define PAIR(_Tp1, _Tp2) struct pair_##_Tp1##_##_Tp2##_s
-
-#define PAIR_T(_Tp1, _Tp2) struct pair_##_Tp1##_##_Tp2##_t
-
-#define MAKE_PAIR(_Tp1, _Tp2, p, q) (PAIR(_Tp1, _Tp2)){p, q}
+size_t fsize(FILE * ifile);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PAIR_H_ */
+#endif /* IO_H_ */

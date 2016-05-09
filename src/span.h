@@ -45,6 +45,7 @@ typedef struct span_##_Tp##_s \
 
 #define MAKE_SPAN(_Tp, ptr, sz) (SPAN(_Tp)){ptr, sz}
 
+#define NULL_SPAN(_Tp) MAKE_SPAN(_Tp, NULL, 0)
 
 #ifdef __cplusplus
 }

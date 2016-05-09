@@ -15,6 +15,8 @@ typedef struct option_s
 
 #include "option_type.h"
 #include "pair.h"
+#include "span.h"
+
 #include <stdint.h>
 
 DEFINE_OPTION_TYPE(double);
@@ -27,6 +29,9 @@ typedef struct program_options_s
     OPTION_TYPE(double) maybe_s; /* number of standard deviations */
     const char * in_file1;
     const char * in_file2;
+
+    SPAN(void) (*scored_tuples_reader)(const char * fname);
+    int (*scored_tuples_deleter)(SPAN(void) span);
 } program_options_t;
 
 

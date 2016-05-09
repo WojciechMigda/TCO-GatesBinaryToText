@@ -25,6 +25,7 @@
 #include "program_options.h"
 #include "data_context.h"
 #include "owner.h"
+#include "io.h"
 
 #include <stdio.h>
 #include <stddef.h>
@@ -34,25 +35,7 @@
 #define USE_MMAP 1
 
 
-size_t fsize(FILE * ifile)
-{
-    const size_t prior_pos = ftell(ifile);
-
-    fseek(ifile, 0L, SEEK_END);
-
-    const size_t sz = ftell(ifile);
-
-    fseek(ifile, prior_pos, SEEK_SET);
-
-    return sz;
-}
-
-
-int check_file_descriptors(FILE * f_ctx
-#ifndef USE_MMAP
-    , FILE * f_data
-#endif
-    )
+int check_file_descriptors(FILE * f_ctx, FILE * f_data)
 {
     const size_t f_ctx_sz = fsize(f_ctx);
 
@@ -67,13 +50,11 @@ int check_file_descriptors(FILE * f_ctx
         return -1;
     }
 
-#ifndef USE_MMAP
     if (fsize(f_data) == 0)
     {
         fprintf(stderr, "Error: empty binary file\n");
         return -1;
     }
-#endif
 
     return 0;
 }
@@ -94,32 +75,6 @@ data_context_t read_data_context(FILE * f_ctx)
 }
 
 
-#ifndef USE_MMAP
-owner(void *) read_scored_tuples(FILE * f_data)
-{
-    const size_t sz = fsize(f_data);
-    rewind(f_data);
-
-    void * data_p = malloc(sz);
-    if (NULL == data_p)
-    {
-        fprintf(stderr, "Error: couldn't allocate memory for data read from file, needed %zu bytes\n", sz);
-        return NULL;
-    }
-
-    const size_t nread = fread(data_p, 1, sz, f_data);
-    if (nread != sz)
-    {
-        fprintf(stderr, "Error: couldn't read context from file, got %zu bytes\n", nread);
-        free(data_p);
-        return NULL;
-    }
-
-    return data_p;
-}
-#endif
-
-
 
 int work(const struct program_options_s * program_options_p)
 {
@@ -130,23 +85,19 @@ int work(const struct program_options_s * program_options_p)
         return -1;
     }
 
-#ifndef USE_MMAP
     FILE * f_data = fopen(program_options_p->in_file2, "rb");
     if (!f_data)
     {
         fprintf(stderr, "Error: couldn't open binary data file \"%s\".\n", program_options_p->in_file2);
         return -1;
     }
-#endif
 
-    if (check_file_descriptors(f_ctx
-#ifndef USE_MMAP
-        , f_data
-#endif
-        ) < 0)
+    if (check_file_descriptors(f_ctx, f_data) < 0)
     {
+        fclose(f_ctx);
         return -1;
     }
+    fclose(f_data);
 
 
     const data_context_t data_ctx = read_data_context(f_ctx);
@@ -166,26 +117,16 @@ int work(const struct program_options_s * program_options_p)
 
 
 
-#ifndef USE_MMAP
-
-    // TODO: if ever, convert to 'span'-based code
-    owner(void *) scored_tuples_p = read_scored_tuples(f_data);
-    free(scored_tuples_p);
-    scored_tuples_p = NULL;
-
-    fclose(f_data);
-    f_data = NULL;
-
-#else
-
-    SPAN(void) scored_tuples = read_scored_tuples(program_options_p->in_file2);
+    const SPAN(void) scored_tuples = program_options_p->scored_tuples_reader(program_options_p->in_file2);
 
 
-    if (release_scored_tuples(scored_tuples) < 0)
+    // build index
+
+
+    if (program_options_p->scored_tuples_deleter(scored_tuples) < 0)
     {
         return -1;
     }
-#endif
 
     return 0;
 }

@@ -22,6 +22,7 @@ include_directories(
 ################################################################################
 
 add_executable( run
+    src/io.c
     src/main.c
     src/parse_program_options.c
     src/read_scored_tuples.c
