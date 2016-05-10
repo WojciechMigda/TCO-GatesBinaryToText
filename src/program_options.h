@@ -1,18 +1,6 @@
 #ifndef PROGRAM_OPTIONS_H_
 #define PROGRAM_OPTIONS_H_
 
-
-typedef struct option_s
-{
-    int n;
-    int k;
-    double b;
-    double s_std;
-    int s_option;
-    char in_file1[50];
-    char in_file2[50];
-} option_t;
-
 #include "option_type.h"
 #include "pair.h"
 #include "span.h"
@@ -32,13 +20,9 @@ typedef struct program_options_s
 
     SPAN(void) (*scored_tuples_reader)(const char * fname);
     int (*scored_tuples_deleter)(SPAN(void) span);
+
+    int nthreads;
 } program_options_t;
-
-
-int parse_args(
-    int argc,
-    char const * argv[],
-    option_t * opt);
 
 
 #endif /* PROGRAM_OPTIONS_H_ */

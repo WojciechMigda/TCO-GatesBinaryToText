@@ -38,19 +38,6 @@
 
 
 
-int check_file_descriptors(FILE * f_data)
-{
-    if (fsize(f_data) == 0)
-    {
-        fprintf(stderr, "Error: empty binary file\n");
-        return -1;
-    }
-
-    return 0;
-}
-
-
-
 int index_cmp(const void * va_p, const void * vb_p)
 {
     DEFINE_PAIR(uint32_t, double);
@@ -110,6 +97,23 @@ int work(const struct program_options_s * program_options_p)
     fprintf(stderr, "Average:\t\t%.10f\n", data_ctx.average);
 
 
+    //// TEST
+    {
+        DEFINE_PAIR(uint32_t, double) __attribute__ ((packed));
+        typedef PAIR(uint32_t, double) indexed_score_t;
+        DEFINE_SPAN(indexed_score_t);
+        SPAN(indexed_score_t) read_scored_index_batch(
+            const char * fname,
+            const size_t tup_dim,
+            const size_t begin,
+            const size_t end
+        );
+        SPAN(indexed_score_t) foo =
+            read_scored_index_batch(program_options_p->in_file2, data_ctx.d, 0, data_ctx.n_tuples);
+        free(foo.ptr);
+    }
+
+    return 0;
 
     const SPAN(void) scored_tuples = program_options_p->scored_tuples_reader(program_options_p->in_file2);
 
