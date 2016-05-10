@@ -34,11 +34,11 @@ extern "C"
 
 
 #define DEFINE_SPAN(_Tp) \
-typedef struct span_##_Tp##_s \
+struct span_##_Tp##_s \
 { \
     _Tp * ptr; \
-    size_t sz; \
-} span_##_Tp##_t
+    size_t sz; /* number of elements, may be different that number of bytes */ \
+}
 
 
 #define SPAN(_Tp) struct span_##_Tp##_s

@@ -1,10 +1,10 @@
 /*******************************************************************************
  * Copyright (c) 2016 Wojciech Migda
  * All rights reserved
- * Distributed under the terms of the MIT License
+ * Distributed under the terms of the GNU LGPL v3
  *******************************************************************************
  *
- * Filename: pair.h
+ * Filename: read_data_context.h
  *
  * Description:
  *      description
@@ -17,37 +17,28 @@
  * --------
  * Date         Who  Ticket     Description
  * ----------   ---  ---------  ------------------------------------------------
- * 2016-05-07   wm              Initial version
+ * 2016-05-10   wm              Initial version
  *
  ******************************************************************************/
 
 
-#ifndef PAIR_H_
-#define PAIR_H_
+#ifndef READ_DATA_CONTEXT_H_
+#define READ_DATA_CONTEXT_H_
+
+#include "data_context.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+enum { BAD_CONTEXT_MARKER = 1 };
 
-#define DEFINE_PAIR(_Tp1, _Tp2) \
-/*typedef*/ struct pair_##_Tp1##_##_Tp2##_s \
-{ \
-    _Tp1 first; \
-    _Tp2 second; \
-} /* pair_##_Tp1##_##_Tp2##_t */
-
-
-#define PAIR(_Tp1, _Tp2) struct pair_##_Tp1##_##_Tp2##_s
-
-//#define PAIR_T(_Tp1, _Tp2) pair_##_Tp1##_##_Tp2##_t
-
-#define MAKE_PAIR(_Tp1, _Tp2, p, q) (PAIR(_Tp1, _Tp2)){p, q}
+data_context_t read_data_context(const char * fname);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PAIR_H_ */
+#endif /* READ_DATA_CONTEXT_H_ */

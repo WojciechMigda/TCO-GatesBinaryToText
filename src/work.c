@@ -21,35 +21,25 @@
  *
  ******************************************************************************/
 
+#include "read_data_context.h"
 #include "read_scored_tuples.h"
 #include "program_options.h"
 #include "data_context.h"
 #include "owner.h"
 #include "io.h"
 
+#include "quicksort.h"
+#include "threaded_sort.h"
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 
-#define USE_MMAP 1
 
-
-int check_file_descriptors(FILE * f_ctx, FILE * f_data)
+int check_file_descriptors(FILE * f_data)
 {
-    const size_t f_ctx_sz = fsize(f_ctx);
-
-    if (f_ctx_sz == 0)
-    {
-        fprintf(stderr, "Error: empty header file\n");
-        return -1;
-    }
-    if (f_ctx_sz != 28)
-    {
-        fprintf(stderr, "Error: bad header file size: %zu\n", f_ctx_sz);
-        return -1;
-    }
-
     if (fsize(f_data) == 0)
     {
         fprintf(stderr, "Error: empty binary file\n");
@@ -60,51 +50,55 @@ int check_file_descriptors(FILE * f_ctx, FILE * f_data)
 }
 
 
-data_context_t read_data_context(FILE * f_ctx)
+
+int index_cmp(const void * va_p, const void * vb_p)
 {
-    data_context_t ctx;
+    DEFINE_PAIR(uint32_t, double);
+    typedef PAIR(uint32_t, double) index_entry_t;
 
-    const size_t nread = fread(&ctx, 1, sizeof (ctx), f_ctx);
-    if (nread != 28)
-    {
-        fprintf(stderr, "Error: couldn't read context from file, got %zu bytes\n", nread);
-        ctx.dummy = 1;
-    }
+    const index_entry_t * a_p = (const index_entry_t *)va_p;
+    const index_entry_t * b_p = (const index_entry_t *)vb_p;
 
-    return ctx;
+    return a_p->second < b_p->second ?
+        1 : (a_p->second > b_p->second ? -1 :
+            a_p->first < b_p->first ?
+                1 : (a_p->first > b_p->first ? - 1 : 0)
+            );
 }
 
+
+int index_cmp_r(const void * va_p, const void * vb_p, void * vc_p)
+{
+    typedef uint32_t index_entry_t;
+
+    const index_entry_t * a_p = (const index_entry_t *)va_p;
+    const index_entry_t * b_p = (const index_entry_t *)vb_p;
+
+    typedef struct
+    {
+        const uint8_t * data_p;
+        uint32_t d;
+    } ctx_t;
+    const ctx_t * c_p = (const ctx_t *)vc_p;
+
+    const uint32_t ia = *a_p;
+    const uint32_t ib = *b_p;
+    const double da = *(double *)(c_p->data_p + ia * (c_p->d * sizeof (uint32_t) + sizeof (double)) + c_p->d * sizeof (uint32_t));
+    const double db = *(double *)(c_p->data_p + ib * (c_p->d * sizeof (uint32_t) + sizeof (double)) + c_p->d * sizeof (uint32_t));
+
+    return da < db ?
+        1 : (da > db ? -1 :
+            ia < ib ?
+                1 : (ia > ib ? - 1 : 0)
+            );
+}
 
 
 int work(const struct program_options_s * program_options_p)
 {
-    FILE * f_ctx = fopen(program_options_p->in_file1, "rb");
-    if (!f_ctx)
-    {
-        fprintf(stderr, "Error: couldn't open header file \"%s\".\n", program_options_p->in_file1);
-        return -1;
-    }
+    const data_context_t data_ctx = read_data_context(program_options_p->in_file1);
 
-    FILE * f_data = fopen(program_options_p->in_file2, "rb");
-    if (!f_data)
-    {
-        fprintf(stderr, "Error: couldn't open binary data file \"%s\".\n", program_options_p->in_file2);
-        return -1;
-    }
-
-    if (check_file_descriptors(f_ctx, f_data) < 0)
-    {
-        fclose(f_ctx);
-        return -1;
-    }
-    fclose(f_data);
-
-
-    const data_context_t data_ctx = read_data_context(f_ctx);
-    fclose(f_ctx);
-    f_ctx = NULL;
-
-    if (data_ctx.dummy != 0)
+    if (data_ctx.dummy == BAD_CONTEXT_MARKER)
     {
         return -1;
     }
@@ -121,6 +115,79 @@ int work(const struct program_options_s * program_options_p)
 
 
     // build index
+    {
+        DEFINE_PAIR(uint32_t, double);
+        typedef PAIR(uint32_t, double) index_entry_t;
+        DEFINE_SPAN(index_entry_t);
+
+        SPAN(index_entry_t) foo[2];
+
+        {
+            void * p = malloc(data_ctx.n_tuples * sizeof (index_entry_t));
+            SPAN(index_entry_t) index = MAKE_SPAN(index_entry_t, p, data_ctx.n_tuples);
+            size_t ix = 0;
+            for (ix = 0; ix < data_ctx.n_tuples; ++ix)
+            {
+                const uint8_t * data_p = (const uint8_t *)scored_tuples.ptr;
+                data_p += ix * (data_ctx.d * sizeof (uint32_t) + sizeof (double));
+                index.ptr[ix].first = ix;
+                index.ptr[ix].second = *((double *)(data_p + data_ctx.d * sizeof (uint32_t)));
+            }
+
+            qsort(index.ptr, index.sz, sizeof (index_entry_t), index_cmp);
+
+            foo[0] = index;
+        }
+        {
+            void * p = malloc(data_ctx.n_tuples * sizeof (index_entry_t));
+            SPAN(index_entry_t) index = MAKE_SPAN(index_entry_t, p, data_ctx.n_tuples);
+            size_t ix = 0;
+            for (ix = 0; ix < data_ctx.n_tuples; ++ix)
+            {
+                const uint8_t * data_p = (const uint8_t *)scored_tuples.ptr;
+                data_p += ix * (data_ctx.d * sizeof (uint32_t) + sizeof (double));
+                index.ptr[ix].first = ix;
+                index.ptr[ix].second = *((double *)(data_p + data_ctx.d * sizeof (uint32_t)));
+            }
+
+            QUICK_SORT(index.ptr, index.sz);
+            foo[1] = index;
+
+            threaded_sort();
+        }
+
+        size_t ix;
+        for (ix = 0; ix < data_ctx.n_tuples; ++ix)
+        {
+            if (foo[0].ptr[ix].first != foo[1].ptr[ix].first)
+            {
+                printf("%zu %lf %lf\n", ix, foo[0].ptr[ix].second, foo[1].ptr[ix].second);
+            }
+        }
+
+        free(foo[0].ptr);
+        free(foo[1].ptr);
+    }
+//    {
+//        typedef uint32_t index_entry_t;
+//        void * p = malloc(data_ctx.n_tuples * sizeof (index_entry_t));
+//        DEFINE_SPAN(index_entry_t);
+//        SPAN(index_entry_t) index = MAKE_SPAN(index_entry_t, p, data_ctx.n_tuples);
+//        size_t ix = 0;
+//        for (ix = 0; ix < data_ctx.n_tuples; ++ix)
+//        {
+//            const uint8_t * data_p = (const uint8_t *)scored_tuples.ptr;
+//            data_p += ix * (data_ctx.d * sizeof (uint32_t) + sizeof (double));
+//            index.ptr[ix] = ix;
+//        }
+//
+//        struct ctx_s
+//        {
+//            const uint8_t * data_p;
+//            uint32_t d;
+//        } ctx = {/*(const uint8_t *)*/scored_tuples.ptr, data_ctx.d};
+//        qsort_r(index.ptr, index.sz, sizeof (index_entry_t), index_cmp_r, &ctx);
+//    }
 
 
     if (program_options_p->scored_tuples_deleter(scored_tuples) < 0)

@@ -97,44 +97,60 @@ int release_scored_tuples_mmap(SPAN(void) span)
 
 SPAN(void) read_scored_tuples_malloc(const char * fname)
 {
-    FILE * f_data = fopen(fname, "rb");
+    FILE * ifile = NULL;
+    void * data_p = NULL;
 
-    if (f_data == NULL)
+    SPAN(void) span = NULL_SPAN(void);
+
+    do
     {
-        perror("fopen");
-        return NULL_SPAN(void);
+        ifile = fopen(fname, "rb");
+        if (ifile == NULL)
+        {
+            fprintf(stderr, "Error: couldn't open tuples data file %s.\n", fname);
+            break;
+        }
+
+        const size_t fsz = fsize(ifile);
+
+        if (fsz == 0)
+        {
+            fprintf(stderr, "Error: empty tuples data file %s\n", fname);
+            break;
+        }
+
+        data_p = malloc(fsz);
+        if (NULL == data_p)
+        {
+            fprintf(stderr, "Error: couldn't allocate memory for tuples data, needed %zu bytes\n", fsz);
+            break;
+        }
+
+        const size_t nread = fread(data_p, 1, fsz, ifile);
+        if (nread != fsz)
+        {
+            fprintf(stderr, "Error: couldn't read tuples data from file, got %zu bytes\n", nread);
+            break;
+        }
+
+        span = MAKE_SPAN(void, data_p, fsz);
+        data_p = NULL;
+
+    } while (0);
+
+    if (ifile != NULL)
+    {
+        fclose(ifile);
+        ifile = NULL;
     }
 
-    const size_t sz = fsize(f_data);
-
-    rewind(f_data);
-
-    void * data_p = malloc(sz);
-    if (NULL == data_p)
+    if (data_p != NULL)
     {
-        fclose(f_data);
-        //fprintf(stderr, "Error: couldn't allocate memory for data read from file, needed %zu bytes\n", sz);
-        perror("malloc");
-        return NULL_SPAN(void);
-    }
-
-    const size_t nread = fread(data_p, 1, sz, f_data);
-    if (nread != sz)
-    {
-        fprintf(stderr, "Error: couldn't read context from file, got %zu bytes\n", nread);
-        fclose(f_data);
         free(data_p);
-        return NULL_SPAN(void);
+        data_p = NULL;
     }
 
-    if (fclose(f_data) != 0)
-    {
-        perror("fclose");
-        free(data_p);
-        return NULL_SPAN(void);
-    }
-
-    return MAKE_SPAN(void, data_p, sz);
+    return span;
 }
 
 
