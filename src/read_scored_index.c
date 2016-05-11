@@ -25,13 +25,11 @@
 #include "span.h"
 #include "io.h"
 #include "scored_tuple_types.h"
+#include "span_indexed_score.h"
 
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-
-DEFINE_SPAN(indexed_score_t);
 
 
 #define TUPLE_DIM 2
@@ -81,8 +79,6 @@ SPAN(indexed_score_t) read_scored_index_batch(
     const size_t end
     )
 {
-    enum { CHUNK = 100 };
-
     FILE * ifile = NULL;
     void * data_p = NULL;
 

@@ -28,6 +28,8 @@
 #include "owner.h"
 #include "io.h"
 
+#include "read_sorted_index.h"
+
 #include "quicksort.h"
 #include "threaded_sort.h"
 
@@ -98,20 +100,21 @@ int work(const struct program_options_s * program_options_p)
 
 
     //// TEST
-    {
-        DEFINE_PAIR(uint32_t, double) __attribute__ ((packed));
-        typedef PAIR(uint32_t, double) indexed_score_t;
-        DEFINE_SPAN(indexed_score_t);
-        SPAN(indexed_score_t) read_scored_index_batch(
-            const char * fname,
-            const size_t tup_dim,
-            const size_t begin,
-            const size_t end
-        );
-        SPAN(indexed_score_t) foo =
-            read_scored_index_batch(program_options_p->in_file2, data_ctx.d, 0, data_ctx.n_tuples);
-        free(foo.ptr);
-    }
+//    {
+//        DEFINE_PAIR(uint32_t, double) __attribute__ ((packed));
+//        typedef PAIR(uint32_t, double) indexed_score_t;
+//        DEFINE_SPAN(indexed_score_t);
+//        SPAN(indexed_score_t) read_scored_index_batch(
+//            const char * fname,
+//            const size_t tup_dim,
+//            const size_t begin,
+//            const size_t end
+//        );
+//        SPAN(indexed_score_t) foo =
+//            read_scored_index_batch(program_options_p->in_file2, data_ctx.d, 0, data_ctx.n_tuples);
+//        free(foo.ptr);
+//    }
+    read_sorted_index(program_options_p->in_file2, data_ctx.n_tuples, data_ctx.d, program_options_p->nthreads);
 
     return 0;
 
