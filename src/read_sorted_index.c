@@ -85,15 +85,15 @@ SPAN(indexed_score_t) read_sorted_index(
                 pthread_attr_init(&attr);
                 pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
-                size_t bix = 0;
-                for (bix = 1; bix < nthreads; ++bix)
+                size_t tid = 0;
+                for (tid = 1; tid < nthreads; ++tid)
                 {
-                    const int rc = pthread_create(&thread[bix - 1], &attr, sorting_thread, (void *)&batches[bix - 1]);
+                    const int rc = pthread_create(&thread[tid - 1], &attr, sorting_thread, (void *)&batches[tid - 1]);
                     if (rc)
                     {
                         fprintf(stderr, "[%s] pthread_create error: %d, ignoring\n", __FILE__, rc);
                     }
-                    batches[bix] = read_scored_index_batch(fname, tupdim, positions[bix], positions[bix + 1]);
+                    batches[tid] = read_scored_index_batch(fname, tupdim, positions[tid], positions[tid + 1]);
                 }
             }
 
@@ -104,11 +104,11 @@ SPAN(indexed_score_t) read_sorted_index(
 
             /* join threads */
             {
-                size_t bix = 0;
-                for (bix = 0; bix < (nthreads - 1); ++bix)
+                size_t tid = 0;
+                for (tid = 0; tid < (nthreads - 1); ++tid)
                 {
                     void * status = NULL;
-                    const int rc = pthread_join(thread[bix], &status);
+                    const int rc = pthread_join(thread[tid], &status);
                     if (rc)
                     {
                         fprintf(stderr, "[%s] pthread_join error: %d, ignoring\n", __FILE__, rc);
@@ -119,6 +119,32 @@ SPAN(indexed_score_t) read_sorted_index(
         else
         {
             batches[0] = sort_indexed_scores(batches[0]);
+        }
+
+        /// TEST
+//        {
+//            size_t ix = 0;
+//            for (ix = 0; ix < nthreads; ++ix)
+//            {
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[0].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[1].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[2].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 3].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 2].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 1].second);
+//                fprintf(stderr, "\n");
+//            }
+//        }
+        if (nthreads > 1)
+        {
+            // http://www.geeksforgeeks.org/merge-k-sorted-arrays/
+            // http://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
+            ;
+        }
+        else
+        {
+            retspan = batches[0];
+            batches[0].ptr = NULL;
         }
 
     } while (0);
