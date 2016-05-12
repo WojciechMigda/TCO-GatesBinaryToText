@@ -26,8 +26,7 @@
 #define INDEXED_SCORE_H_
 
 #include "pair.h"
-
-#include <stdint.h>
+#include "var_type.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -35,9 +34,9 @@ extern "C"
 #endif
 
 
-DEFINE_PAIR(uint32_t, double) __attribute__ ((packed));
+DEFINE_PAIR(var_t, double) __attribute__ ((packed));
 
-typedef PAIR(uint32_t, double) indexed_score_t;
+typedef PAIR(var_t, double) indexed_score_t;
 
 
 #ifdef __cplusplus
