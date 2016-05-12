@@ -30,6 +30,11 @@
 
 #include "read_sorted_index.h"
 
+#include "span_var.h"
+#include "span_indexed_score.h"
+DEFINE_PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t));
+#include "read_tuples_and_sorted_index.h"
+
 #include "quicksort.h"
 
 #include <stdio.h>
@@ -98,26 +103,22 @@ int work(const struct program_options_s * program_options_p)
     fprintf(stderr, "Average:\t\t%.10f\n", data_ctx.average);
 
 
-    //// TEST
-//    {
-//        DEFINE_PAIR(uint32_t, double) __attribute__ ((packed));
-//        typedef PAIR(uint32_t, double) indexed_score_t;
-//        DEFINE_SPAN(indexed_score_t);
-//        SPAN(indexed_score_t) read_scored_index_batch(
-//            const char * fname,
-//            const size_t tup_dim,
-//            const size_t begin,
-//            const size_t end
-//        );
-//        SPAN(indexed_score_t) foo =
-//            read_scored_index_batch(program_options_p->in_file2, data_ctx.d, 0, data_ctx.n_tuples);
-//        free(foo.ptr);
-//    }
-    read_sorted_index(program_options_p->in_file2, data_ctx.n_tuples, data_ctx.d, program_options_p->nthreads);
+//    SPAN(indexed_score_t) indexed_score = read_sorted_index(program_options_p->in_file2, data_ctx.n_tuples, data_ctx.d, program_options_p->nthreads);
+//    free(indexed_score.ptr);
+
+    PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t)) tuples_and_indexed_score =
+        read_tuples_and_sorted_index(program_options_p->in_file2, data_ctx.n_tuples, data_ctx.d, program_options_p->nthreads);
+    free(tuples_and_indexed_score.first.ptr);
+    free(tuples_and_indexed_score.second.ptr);
 
     return 0;
 
+
+
+
+
     const SPAN(void) scored_tuples = program_options_p->scored_tuples_reader(program_options_p->in_file2);
+
 
 
     // build index
