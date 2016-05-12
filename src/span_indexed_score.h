@@ -35,6 +35,7 @@ extern "C"
 
 
 DEFINE_SPAN(indexed_score_t);
+DEFINE_SPAN_T(indexed_score_t);
 
 
 #ifdef __cplusplus
