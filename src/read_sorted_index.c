@@ -26,6 +26,7 @@
 #include "pair.h"
 #include "read_scored_index.h"
 #include "sort_indexed_scores.h"
+#include "span_indexed_score.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -33,6 +34,40 @@
 #include <stdio.h>
 
 #include <pthread.h>
+
+
+#include <string.h>
+
+typedef SPAN(indexed_score_t) span_indexed_score_t;
+DEFINE_SPAN(span_indexed_score_t);
+
+SPAN(indexed_score_t)
+naive_merge_sorted_scores_batches(SPAN(span_indexed_score_t) batches)
+{
+    size_t total_sz = 0;
+    size_t ix = 0;
+    for (ix = 0; ix < batches.sz; ++ix)
+    {
+        total_sz += batches.ptr[ix].sz;
+    }
+
+    const size_t item_sz = sizeof (batches.ptr[0].ptr[0]);
+
+    indexed_score_t * combined_p = malloc(total_sz * item_sz);
+
+    size_t nwritten = 0;
+    for (ix = 0; ix < batches.sz; ++ix)
+    {
+        memcpy(&combined_p[nwritten], batches.ptr[ix].ptr, batches.ptr[ix].sz * item_sz);
+        free(batches.ptr[ix].ptr);
+        batches.ptr[ix].ptr = NULL;
+        nwritten += batches.ptr[ix].sz;
+    }
+
+    qsort(combined_p, total_sz, sizeof (batches.ptr[0].ptr[0]), cmp_indexed_score_by_score_asc);
+
+    return MAKE_SPAN(indexed_score_t, combined_p, total_sz);
+}
 
 
 static
@@ -139,13 +174,22 @@ SPAN(indexed_score_t) read_sorted_index(
         {
             // http://www.geeksforgeeks.org/merge-k-sorted-arrays/
             // http://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
-            ;
+
+#warning TODO: naive_merge_sorted_scores_batches
+            retspan = naive_merge_sorted_scores_batches(MAKE_SPAN(span_indexed_score_t, batches, nthreads));
         }
         else
         {
             retspan = batches[0];
             batches[0].ptr = NULL;
         }
+
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[0].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[1].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[2].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 3].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 2].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 1].second);
 
     } while (0);
 
