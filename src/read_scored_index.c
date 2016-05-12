@@ -26,6 +26,7 @@
 #include "io.h"
 #include "scored_tuple_types.h"
 #include "span_indexed_score.h"
+#include "var_type.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -84,7 +85,7 @@ SPAN(indexed_score_t) read_scored_index_batch(
 
     SPAN(indexed_score_t) span = NULL_SPAN(indexed_score_t);
 
-    const size_t tupsz = sizeof (uint32_t) * tup_dim + sizeof (double);
+    const size_t tupsz = sizeof (var_t) * tup_dim + sizeof (double);
 
     do
     {
