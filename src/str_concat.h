@@ -36,6 +36,7 @@ extern "C"
 #define STR_CONCAT2(p, q)           MAKE_STR2(p, q)
 #define STR_CONCAT3(p, q, r)        MAKE_STR3(p, q, r)
 #define STR_CONCAT4(p, q, r, s)     MAKE_STR4(p, q, r, s)
+#define STR_CONCAT5(p, q, r, s, t)  MAKE_STR5(p, q, r, s, t)
 
 
 #ifdef __cplusplus

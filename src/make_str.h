@@ -30,9 +30,10 @@ extern "C"
 {
 #endif
 
-#define MAKE_STR2(p, q)         p ## q
-#define MAKE_STR3(p, q, r)      p ## q ## r
-#define MAKE_STR4(p, q, r, s)   p ## q ## r ## s
+#define MAKE_STR2(p, q)             p ## q
+#define MAKE_STR3(p, q, r)          p ## q ## r
+#define MAKE_STR4(p, q, r, s)       p ## q ## r ## s
+#define MAKE_STR5(p, q, r, s, t)    p ## q ## r ## s ## t
 
 #ifdef __cplusplus
 }
