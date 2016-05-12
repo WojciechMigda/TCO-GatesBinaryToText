@@ -25,6 +25,8 @@
 #ifndef SPAN_H_
 #define SPAN_H_
 
+#include "str_concat.h"
+
 #include <stddef.h>
 
 #ifdef __cplusplus
@@ -33,15 +35,14 @@ extern "C"
 #endif
 
 
+#define SPAN(_Tp) struct STR_CONCAT3(span_, _Tp, _s)
+
 #define DEFINE_SPAN(_Tp) \
-struct span_##_Tp##_s \
+SPAN(_Tp) \
 { \
     _Tp * ptr; \
     size_t sz; /* number of elements, may be different that number of bytes */ \
 }
-
-
-#define SPAN(_Tp) struct span_##_Tp##_s
 
 #define MAKE_SPAN(_Tp, ptr, sz) (SPAN(_Tp)){ptr, sz}
 
