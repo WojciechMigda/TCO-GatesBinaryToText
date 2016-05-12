@@ -8,12 +8,13 @@
 #endif
 
 #include "str_concat.h"
+#include "var_type.h"
 
 #define MAKE_NAME(p, s) STR_CONCAT3(p, TUPLE_DIM, s)
 
 typedef struct MAKE_NAME(scored_tuple_d, _s)
 {
-    uint32_t var[TUPLE_DIM];
+    var_t var[TUPLE_DIM];
     double score;
 } __attribute__ ((packed))
 MAKE_NAME(scored_tuple_d, _t);
