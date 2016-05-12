@@ -31,7 +31,6 @@
 #include "read_sorted_index.h"
 
 #include "quicksort.h"
-#include "threaded_sort.h"
 
 #include <stdio.h>
 #include <stddef.h>
@@ -159,8 +158,6 @@ int work(const struct program_options_s * program_options_p)
 
             QUICK_SORT(index.ptr, index.sz);
             foo[1] = index;
-
-            threaded_sort();
         }
 
         size_t ix;
