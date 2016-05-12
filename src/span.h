@@ -36,6 +36,7 @@ extern "C"
 
 
 #define SPAN(_Tp) struct STR_CONCAT3(span_, _Tp, _s)
+#define SPAN_T(_Tp) STR_CONCAT3(span_, _Tp, _t)
 
 #define DEFINE_SPAN(_Tp) \
 SPAN(_Tp) \
@@ -43,6 +44,8 @@ SPAN(_Tp) \
     _Tp * ptr; \
     size_t sz; /* number of elements, may be different that number of bytes */ \
 }
+
+#define DEFINE_SPAN_T(_Tp) typedef SPAN(_Tp) SPAN_T(_Tp) __attribute__ ((unused))
 
 #define MAKE_SPAN(_Tp, ptr, sz) (SPAN(_Tp)){ptr, sz}
 
