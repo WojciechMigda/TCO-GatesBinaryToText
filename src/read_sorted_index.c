@@ -65,6 +65,8 @@ naive_merge_sorted_scores_batches(SPAN(span_indexed_score_t) batches)
     }
 
     qsort(combined_p, total_sz, sizeof (batches.ptr[0].ptr[0]), cmp_indexed_score_by_score_asc);
+//    void _quicksort (void *const pbase, size_t total_elems, size_t size, int (*cmp)(const void *, const void *), void *arg);
+//    _quicksort(combined_p, total_sz, sizeof (batches.ptr[0].ptr[0]), cmp_indexed_score_by_score_asc, NULL);
 
     return MAKE_SPAN(indexed_score_t, combined_p, total_sz);
 }
