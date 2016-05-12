@@ -60,8 +60,8 @@ typedef void (*read_tuples_and_scored_index_sub_t)(
     indexed_score_t * __restrict__ score_p,
     var_t * __restrict__ var_p,
     FILE * __restrict__ ifile,
-    size_t begin,
-    size_t end);
+    const size_t begin,
+    const size_t end);
 
 const read_tuples_and_scored_index_sub_t read_tuples_and_scored_index_sub[] =
 {

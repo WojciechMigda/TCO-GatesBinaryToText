@@ -20,8 +20,8 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
     indexed_score_t * __restrict__ score_p,
     var_t * __restrict__ tup_p,
     FILE * __restrict__ ifile,
-    size_t begin,
-    size_t end
+    const size_t begin,
+    const size_t end
     )
 {
     enum { CHUNK = 1000 };
@@ -47,6 +47,17 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
         {
             const double score = buf[bix].score;
             score_p[cix + bix - begin] = (indexed_score_t){cix + bix, score};
+
+//            size_t vix = 0;
+//            for (vix = 0; vix < TUPLE_DIM; ++vix)
+//            {
+//                tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = buf[bix].var[vix];
+//            }
+        }
+        for (bix = 0; bix < CHUNK; ++bix)
+        {
+//            const double score = buf[bix].score;
+//            score_p[cix + bix - begin] = (indexed_score_t){cix + bix, score};
 
             size_t vix = 0;
             for (vix = 0; vix < TUPLE_DIM; ++vix)
