@@ -25,23 +25,22 @@
 #ifndef PAIR_H_
 #define PAIR_H_
 
+#include "str_concat.h"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
 
+#define PAIR(_Tp1, _Tp2) struct STR_CONCAT5(pair_, _Tp1, _, _Tp2, _s)
+
 #define DEFINE_PAIR(_Tp1, _Tp2) \
-/*typedef*/ struct pair_##_Tp1##_##_Tp2##_s \
+PAIR(_Tp1, _Tp2) \
 { \
     _Tp1 first; \
     _Tp2 second; \
-} /* pair_##_Tp1##_##_Tp2##_t */
-
-
-#define PAIR(_Tp1, _Tp2) struct pair_##_Tp1##_##_Tp2##_s
-
-//#define PAIR_T(_Tp1, _Tp2) pair_##_Tp1##_##_Tp2##_t
+}
 
 #define MAKE_PAIR(_Tp1, _Tp2, p, q) (PAIR(_Tp1, _Tp2)){p, q}
 
