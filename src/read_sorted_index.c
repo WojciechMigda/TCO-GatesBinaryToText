@@ -27,6 +27,9 @@
 #include "read_scored_index.h"
 #include "sort_indexed_scores.h"
 #include "span_indexed_score.h"
+#include "span_var.h"
+#include "read_tuples_and_scored_index.h"
+
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -208,4 +211,155 @@ SPAN(indexed_score_t) read_sorted_index(
     }
 
     return retspan;
+}
+
+DEFINE_PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t));
+
+PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t))
+read_tuples_and_sorted_index(
+    const char * fname,
+    size_t ntuples,
+    size_t tup_dim,
+    int nthreads)
+{
+    SPAN(indexed_score_t) batches[nthreads];
+    SPAN(indexed_score_t) xspan = NULL_SPAN(indexed_score_t);
+    SPAN(var_t) vspan = NULL_SPAN(var_t);
+
+    void * vars_p = NULL;
+
+    do
+    {
+        /* allocate space for tuples */
+        vars_p = malloc(tup_dim * sizeof (var_t) * ntuples);
+        if (vars_p == NULL)
+        {
+            fprintf(stderr, "[%s] Failed to allocate memory for tuples, needed %zu bytes\n",
+                __FILE__, tup_dim * sizeof (var_t) * ntuples);
+            break;
+        }
+
+        /* construct tuples ranges */
+        size_t positions[nthreads + 1];
+        positions[0] = 0;
+
+        {
+            size_t ix = 0;
+            const float delta = (float)ntuples / nthreads;
+            for (ix = 1; ix <= nthreads; ++ix)
+            {
+                positions[ix] = round(delta * ix);
+            }
+        }
+
+        /* read first batch */
+        batches[0] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[0], positions[1],
+            MAKE_SPAN(var_t, (var_t *)vars_p + positions[0] * tup_dim, (positions[1] - positions[0]) * tup_dim));
+
+        if (nthreads > 1)
+        {
+            pthread_t thread[nthreads - 1];
+            pthread_attr_t attr;
+            /* loop: dispatch sort, read next batch */
+            {
+                pthread_attr_init(&attr);
+                pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+                size_t tid = 0;
+                for (tid = 1; tid < nthreads; ++tid)
+                {
+                    const int rc = pthread_create(&thread[tid - 1], &attr, sorting_thread, (void *)&batches[tid - 1]);
+                    if (rc)
+                    {
+                        fprintf(stderr, "[%s] pthread_create error: %d, ignoring\n", __FILE__, rc);
+                    }
+                    batches[tid] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[tid], positions[tid + 1],
+                        MAKE_SPAN(var_t, (var_t *)vars_p + positions[tid] * tup_dim, (positions[tid + 1] - positions[tid]) * tup_dim));
+                }
+            }
+
+            pthread_attr_destroy(&attr);
+
+            /* sort last batch */
+            batches[nthreads - 1] = sort_indexed_scores(batches[nthreads - 1]);
+
+            /* join threads */
+            {
+                size_t tid = 0;
+                for (tid = 0; tid < (nthreads - 1); ++tid)
+                {
+                    void * status = NULL;
+                    const int rc = pthread_join(thread[tid], &status);
+                    if (rc)
+                    {
+                        fprintf(stderr, "[%s] pthread_join error: %d, ignoring\n", __FILE__, rc);
+                    }
+                }
+            }
+        }
+        else
+        {
+            batches[0] = sort_indexed_scores(batches[0]);
+        }
+
+        /// TEST
+//        {
+//            size_t ix = 0;
+//            for (ix = 0; ix < nthreads; ++ix)
+//            {
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[0].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[1].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[2].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 3].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 2].second);
+//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 1].second);
+//                fprintf(stderr, "\n");
+//            }
+//        }
+        if (nthreads > 1)
+        {
+            // http://www.geeksforgeeks.org/merge-k-sorted-arrays/
+            // http://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
+
+#warning TODO: naive_merge_sorted_scores_batches
+            /* it frees pointers in batches */
+            xspan = naive_merge_sorted_scores_batches(MAKE_SPAN(span_indexed_score_t, batches, nthreads));
+        }
+        else
+        {
+            xspan = batches[0];
+            batches[0].ptr = NULL;
+        }
+
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[0].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[1].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[2].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 3].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 2].second);
+//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 1].second);
+
+        vspan = MAKE_SPAN(var_t, vars_p, ntuples * tup_dim);
+        vars_p = NULL;
+
+    } while (0);
+
+    if (vars_p != NULL)
+    {
+        free(vars_p);
+        vars_p = NULL;
+    }
+
+    {
+        size_t ix = 0;
+
+        for (ix = 0; ix < nthreads; ++ix)
+        {
+            if (batches[ix].ptr != NULL)
+            {
+                free(batches[ix].ptr);
+            }
+        }
+    }
+
+    return MAKE_PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t), vspan, xspan);
 }
