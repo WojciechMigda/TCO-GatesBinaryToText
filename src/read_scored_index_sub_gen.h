@@ -36,7 +36,10 @@ void MAKE_FUN_NAME(read_scored_index_sub_d)(
 
         scored_tuple_t buf[CHUNK];
         const size_t nread = fread(buf, sizeof (scored_tuple_t), CHUNK, ifile);
-        (void)nread;
+        if (nread != CHUNK)
+        {
+            fprintf(stderr, "[%s] Could not read entire chunk from file\n", __FILE__);
+        }
 
         size_t bix = 0;
         for (bix = 0; bix < CHUNK; ++bix)
