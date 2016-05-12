@@ -35,6 +35,8 @@ extern "C"
 #endif
 
 
+int cmp_indexed_score_by_score_asc(const void * vap, const void * vbp);
+
 SPAN(indexed_score_t) sort_indexed_scores(SPAN(indexed_score_t) span);
 
 

@@ -28,7 +28,6 @@
 #include <stdlib.h>
 
 
-static
 int cmp_indexed_score_by_score_asc(const void * vap, const void * vbp)
 {
     const indexed_score_t * ap = (const indexed_score_t *)vap;
