@@ -213,6 +213,7 @@ SPAN(indexed_score_t) read_sorted_index(
     return retspan;
 }
 
+
 DEFINE_PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t));
 
 PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t))
@@ -246,11 +247,12 @@ read_tuples_and_sorted_index(
         {
             size_t ix = 0;
             const float delta = (float)ntuples / nthreads;
-            for (ix = 1; ix <= nthreads; ++ix)
+            for (ix = 1; ix < nthreads; ++ix)
             {
                 positions[ix] = round(delta * ix);
             }
         }
+        positions[nthreads] = ntuples;
 
         /* read first batch */
         batches[0] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[0], positions[1],
