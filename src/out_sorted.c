@@ -28,6 +28,7 @@
 #include "min_max.h"
 #include "cstring_score.h"
 #include "score_as_cstring.h"
+#include "timestamp.h"
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -42,6 +43,10 @@ void out_scored_tuple2(
     const char * alpha_score_p)
 {
     const size_t vix = tix * 2;
+
+    // https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html
+    //__builtin_prefetch(&base_p[vix], 0, 0);
+
     fprintf(ofile, "%u\t%u\t%s\n",
         base_p[vix],
         base_p[vix + 1],
@@ -197,6 +202,8 @@ void out2(
 
     FILE * ofile = NULL;
 
+    uint64_t time0 = timestamp();
+
     do
     {
         const char * fname = "out2.txt";
@@ -240,6 +247,8 @@ void out2(
     {
         fclose(ofile);
     }
+
+    fprintf(stderr, "[out2] Done, %lu msec\n", timestamp() - time0);
 }
 
 
@@ -256,6 +265,8 @@ void out1(
     const out_scored_tuple_fn out_scored_tuple = out_scored_tuple_fns[tup_dim - 2];
 
     FILE * ofile = NULL;
+
+    uint64_t time0 = timestamp();
 
     do
     {
@@ -300,4 +311,6 @@ void out1(
     {
         fclose(ofile);
     }
+
+    fprintf(stderr, "[out1] Done, %lu msec\n", timestamp() - time0);
 }
