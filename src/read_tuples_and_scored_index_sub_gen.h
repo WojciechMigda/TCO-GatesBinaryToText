@@ -12,6 +12,8 @@
 
 #include "str_concat.h"
 
+#include <string.h>
+
 #define MAKE_FUN_NAME(x) STR_CONCAT2(x, TUPLE_DIM)
 #define MAKE_TUPLE_NAME(p, s) STR_CONCAT3(p, TUPLE_DIM, s)
 
@@ -35,6 +37,7 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
         const size_t offset = cix * sizeof (scored_tuple_t);
         fseek(ifile, offset, SEEK_SET);
 
+
         scored_tuple_t buf[CHUNK];
         const size_t nread = fread(buf, sizeof (scored_tuple_t), CHUNK, ifile);
         if (nread != CHUNK)
@@ -47,22 +50,24 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
         {
             const double score = buf[bix].score;
             score_p[cix + bix - begin] = (indexed_score_t){cix + bix, score};
-
-//            size_t vix = 0;
-//            for (vix = 0; vix < TUPLE_DIM; ++vix)
-//            {
-//                tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = buf[bix].var[vix];
-//            }
         }
         for (bix = 0; bix < CHUNK; ++bix)
         {
-//            const double score = buf[bix].score;
-//            score_p[cix + bix - begin] = (indexed_score_t){cix + bix, score};
-
-            size_t vix = 0;
-            for (vix = 0; vix < TUPLE_DIM; ++vix)
+            /* SEGFAULT ALERT:
+             * There's a bug in my compiler (5.2.1) which generates assembler
+             * which for TUPLE_DIM == 4 reads xmm register from address not
+             * aligned on 16 bytes */
+            if (TUPLE_DIM < 4)
             {
-                tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = buf[bix].var[vix];
+                size_t vix = 0;
+                for (vix = 0; vix < TUPLE_DIM; ++vix)
+                {
+                    tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = buf[bix].var[vix];
+                }
+            }
+            else
+            {
+                memcpy(&tup_p[TUPLE_DIM * (cix + bix - begin)], buf[bix].var, sizeof (buf[bix].var));
             }
         }
     }
