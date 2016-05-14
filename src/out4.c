@@ -24,6 +24,7 @@
 #include "span.h"
 #include "indexed_score.h"
 #include "span_indexed_score.h"
+#include "timestamp.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +41,8 @@ void out4(
 
     FILE * ofile = NULL;
     size_t * counter_p = NULL;
+
+    const uint64_t time0 = timestamp();
 
     do
     {
@@ -105,5 +108,5 @@ void out4(
         free(counter_p);
     }
 
-    fprintf(stderr, "[out4] Done\n");
+    fprintf(stderr, "[out4] Done, %lu msec\n", timestamp() - time0);
 }
