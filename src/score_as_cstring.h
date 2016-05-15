@@ -30,6 +30,8 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <math.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -60,13 +62,12 @@ void score_as_cstring(const double score, cstring_score_t * out_p)
     else
     {
         p[0] = '-';
-        p += (magic.l < 0);
+        p += !!signbit(score);
         const size_t sz = snprintf(p, sizeof (*out_p), "%012ld", magic.l);
 
         p[sz - 12] = p[sz - 11]; /* leading digit */
         p[sz - 11] = '.';
     }
-
 }
 
 
