@@ -25,6 +25,7 @@
 #ifndef SCORE_AS_CSTRING_H_
 #define SCORE_AS_CSTRING_H_
 
+#include "cstring_score.h"
 #include "likely.h"
 
 #include <stdio.h>
@@ -35,7 +36,7 @@ extern "C"
 {
 #endif
 
-
+static inline
 void score_as_cstring(const double score, cstring_score_t * out_p)
 {
     union
