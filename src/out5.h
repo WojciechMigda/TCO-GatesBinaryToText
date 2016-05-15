@@ -44,6 +44,7 @@ void out5(
     SPAN(var_t) tuples,
     const size_t tup_dim,
     const double mean,
+    const double sum_sq,
     const double s,
     int nthreads);
 

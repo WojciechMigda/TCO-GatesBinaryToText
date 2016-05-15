@@ -207,21 +207,21 @@ out_scored_tuple_fn out_scored_tuple_fns[] =
 };
 
 
-#include <string.h>
-static
-double std(SPAN(indexed_score_t) indexed_scores, const double mean)
-{
-    size_t ix = 0;
-    double sum = 0.;
-
-    for (ix = 0; ix < indexed_scores.sz; ++ix)
-    {
-        const double delta = indexed_scores.ptr[ix].second - mean;
-        sum += (delta * delta);
-    }
-
-    return sqrt(sum / (indexed_scores.sz - 0));
-}
+//#include <string.h>
+//static
+//double std(SPAN(indexed_score_t) indexed_scores, const double mean)
+//{
+//    size_t ix = 0;
+//    double sum = 0.;
+//
+//    for (ix = 0; ix < indexed_scores.sz; ++ix)
+//    {
+//        const double delta = indexed_scores.ptr[ix].second - mean;
+//        sum += (delta * delta);
+//    }
+//
+//    return sqrt(sum / (indexed_scores.sz - 0));
+//}
 
 
 void out5(
@@ -229,6 +229,7 @@ void out5(
     SPAN(var_t) tuples,
     const size_t tup_dim,
     const double mean,
+    const double sum_sq,
     const double s,
     int nthreads)
 {
@@ -258,7 +259,8 @@ void out5(
             break;
         }
 
-        const double std_dev = std(indexed_scores, mean);
+        //const double std_dev = std(indexed_scores, mean);
+        const double std_dev = sqrt(sum_sq / indexed_scores.sz);
 
         const int is_odd = tup_dim % 2;
         const double cutoff = is_odd ? mean - s * std_dev : mean + s * std_dev;
