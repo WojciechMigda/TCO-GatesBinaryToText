@@ -31,7 +31,7 @@ extern "C"
 #endif
 
 
-typedef char (cstring_score_t)[1 + sizeof ("-1.0123456789")];
+typedef char (cstring_score_t)[1 + sizeof ("--1.0123456789")];
 
 
 #ifdef __cplusplus
