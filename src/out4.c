@@ -61,6 +61,13 @@ void out4(
 
         if (bucket_sz == 0.)
         {
+            fprintf(stderr, "[out4] bucket size is zero\n");
+            break;
+        }
+
+        if (indexed_scores.sz == 0)
+        {
+            fprintf(stderr, "[out4] there is no data to process\n");
             break;
         }
 
