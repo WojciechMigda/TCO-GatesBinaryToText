@@ -221,7 +221,9 @@ read_tuples_and_sorted_index(
     const char * fname,
     size_t ntuples,
     size_t tup_dim,
-    int nthreads)
+    int nthreads,
+    const double mean,
+    double * sum_sq)
 {
     SPAN(indexed_score_t) batches[nthreads];
     SPAN(indexed_score_t) xspan = NULL_SPAN(indexed_score_t);
@@ -256,7 +258,8 @@ read_tuples_and_sorted_index(
 
         /* read first batch */
         batches[0] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[0], positions[1],
-            MAKE_SPAN(var_t, (var_t *)vars_p + positions[0] * tup_dim, (positions[1] - positions[0]) * tup_dim));
+            MAKE_SPAN(var_t, (var_t *)vars_p + positions[0] * tup_dim, (positions[1] - positions[0]) * tup_dim),
+            sum_sq, mean);
 
         if (nthreads > 1)
         {
@@ -276,7 +279,8 @@ read_tuples_and_sorted_index(
                         fprintf(stderr, "[%s] pthread_create error: %d, ignoring\n", __FILE__, rc);
                     }
                     batches[tid] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[tid], positions[tid + 1],
-                        MAKE_SPAN(var_t, (var_t *)vars_p + positions[tid] * tup_dim, (positions[tid + 1] - positions[tid]) * tup_dim));
+                        MAKE_SPAN(var_t, (var_t *)vars_p + positions[tid] * tup_dim, (positions[tid + 1] - positions[tid]) * tup_dim),
+                        sum_sq, mean);
                 }
             }
 

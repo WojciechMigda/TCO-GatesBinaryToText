@@ -44,7 +44,9 @@ read_tuples_and_scored_index_batch(
     const size_t tup_dim,
     const size_t begin,
     const size_t end,
-    SPAN(var_t) vspan
+    SPAN(var_t) vspan,
+    double * sum_sq,
+    const double mean
     );
 
 #ifdef __cplusplus

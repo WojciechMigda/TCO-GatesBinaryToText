@@ -61,7 +61,9 @@ typedef void (*read_tuples_and_scored_index_sub_t)(
     var_t * __restrict__ var_p,
     FILE * __restrict__ ifile,
     const size_t begin,
-    const size_t end);
+    const size_t end,
+    double * sum_sq,
+    const double mean);
 
 const read_tuples_and_scored_index_sub_t read_tuples_and_scored_index_sub[] =
 {
@@ -81,7 +83,9 @@ read_tuples_and_scored_index_batch(
     const size_t tup_dim,
     const size_t begin,
     const size_t end,
-    SPAN(var_t) vspan
+    SPAN(var_t) vspan,
+    double * sum_sq,
+    const double mean
     )
 {
     FILE * ifile = NULL;
@@ -113,7 +117,7 @@ read_tuples_and_scored_index_batch(
         }
 
 
-        read_tuples_and_scored_index_sub[tup_dim - 2](scores_p, vspan.ptr, ifile, begin, end);
+        read_tuples_and_scored_index_sub[tup_dim - 2](scores_p, vspan.ptr, ifile, begin, end, sum_sq, mean);
 
 
         xspan = MAKE_SPAN(indexed_score_t, scores_p, end - begin);

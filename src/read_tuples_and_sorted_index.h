@@ -44,7 +44,9 @@ read_tuples_and_sorted_index(
     const char * fname,
     size_t ntuples,
     size_t tup_dim,
-    int nthreads);
+    int nthreads,
+    const double mean,
+    double * sum_sq);
 
 
 #ifdef __cplusplus
