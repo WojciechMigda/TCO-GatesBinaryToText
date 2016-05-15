@@ -35,7 +35,7 @@ extern "C"
 {
 #endif
 
-enum {DEQUE_PIECE_NELEM = 65536};
+enum {DEQUE_PIECE_NELEM = 512};
 
 typedef struct deque_piece_s
 {
