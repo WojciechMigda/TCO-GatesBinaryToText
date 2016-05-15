@@ -32,11 +32,61 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+
+static inline
+size_t naive_ltoa_padded12(int64_t v, char * p)
+{
+    if (UNLIKELY(v == 0))
+    {
+        memset(p, '0', 12);
+        p[12] = 0;
+    }
+    else if (v > 0)
+    {
+        p[12] = 0;
+        char * wp = p + 11;
+
+        do
+        {
+            const int64_t rem = v % 10;
+            v /= 10;
+            *wp-- = '0' + rem;
+        } while (v != 0 && wp != p);
+        while (wp != p)
+        {
+            *wp-- = '0';
+        }
+        p[0] = '0';
+    }
+    else
+    {
+        v = -v;
+        p[12] = 0;
+        char * wp = p + 11;
+
+        do
+        {
+            const int64_t rem = v % 10;
+            v /= 10;
+            *wp-- = '0' + rem;
+        } while (v != 0 && wp != p);
+        while (wp != p)
+        {
+            *wp-- = '0';
+        }
+        p[0] = '-';
+    }
+
+    return 12;
+}
+
 
 static inline
 void score_as_cstring(const double score, cstring_score_t * out_p)
@@ -65,7 +115,8 @@ void score_as_cstring(const double score, cstring_score_t * out_p)
     {
         p[0] = '-';
         p += !!signbit(score);
-        const size_t sz = snprintf(p, sizeof (*out_p), "%012ld", magic.l);
+        //const size_t sz = snprintf(p, sizeof (*out_p), "%012ld", magic.l);
+        const size_t sz = naive_ltoa_padded12(magic.l, p);
 
         p[sz - 12] = p[sz - 11]; /* leading digit */
         p[sz - 11] = '.';
