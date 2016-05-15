@@ -37,13 +37,13 @@ extern "C"
 
 
 static inline
-void naive_utoa(uint32_t val, cstring_uint32_t * out_p)
+char * naive_utoa(uint32_t val, cstring_uint32_t * out_p)
 {
     if (UNLIKELY(val == 0))
     {
         (*out_p)[0] = '0';
         (*out_p)[1] = 0;
-        return;
+        return &(*out_p)[1];
     }
 
     char buf[sizeof ("4294967295")];
@@ -63,6 +63,8 @@ void naive_utoa(uint32_t val, cstring_uint32_t * out_p)
         *wp++ = *p;
     }
     *wp = 0;
+
+    return wp;
 }
 
 
