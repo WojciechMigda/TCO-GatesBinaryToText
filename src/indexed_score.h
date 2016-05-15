@@ -26,6 +26,7 @@
 #define INDEXED_SCORE_H_
 
 #include "pair.h"
+#include "tuple_ix_type.h"
 
 #include <stdint.h>
 
@@ -35,9 +36,9 @@ extern "C"
 #endif
 
 
-DEFINE_PAIR(uint32_t, double) __attribute__ ((packed));
+DEFINE_PAIR(tuple_ix_t, double) __attribute__ ((packed));
 
-typedef PAIR(uint32_t, double) indexed_score_t;
+typedef PAIR(tuple_ix_t, double) indexed_score_t;
 
 
 #ifdef __cplusplus
