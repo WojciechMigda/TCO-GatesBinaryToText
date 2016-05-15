@@ -35,7 +35,7 @@
 #include <stdio.h>
 
 
-static inline
+static
 void out_scored_tuple2(
     FILE * ofile,
     const var_t * base_p,
@@ -58,7 +58,7 @@ void out_scored_tuple2(
 }
 
 
-static inline
+static
 void out_scored_tuple3(
     FILE * ofile,
     const var_t * base_p,
@@ -74,7 +74,7 @@ void out_scored_tuple3(
 }
 
 
-static inline
+static
 void out_scored_tuple4(
     FILE * ofile,
     const var_t * base_p,
@@ -91,7 +91,7 @@ void out_scored_tuple4(
 }
 
 
-static inline
+static
 void out_scored_tuple5(
     FILE * ofile,
     const var_t * base_p,
@@ -109,7 +109,7 @@ void out_scored_tuple5(
 }
 
 
-static inline
+static
 void out_scored_tuple6(
     FILE * ofile,
     const var_t * base_p,
@@ -128,7 +128,7 @@ void out_scored_tuple6(
 }
 
 
-static inline
+static
 void out_scored_tuple7(
     FILE * ofile,
     const var_t * base_p,
@@ -148,7 +148,7 @@ void out_scored_tuple7(
 }
 
 
-static inline
+static
 void out_scored_tuple8(
     FILE * ofile,
     const var_t * base_p,
@@ -175,7 +175,7 @@ typedef void (*out_scored_tuple_fn)(
     const size_t tix,
     const char * alpha_score_p);
 
-
+static
 out_scored_tuple_fn out_scored_tuple_fns[] =
 {
     out_scored_tuple2,
