@@ -1,50 +1,56 @@
-CLFLAGS=-O3 -DNDEBUG $(INLINE_WARN) $(INLINE_LIMIT) -pthread
-GPP=gcc
+CLFLAGS=-O3 -DNDEBUG -D_GNU_SOURCE -std=c99 -unroll-loops -Wall -pedantic -mmmx -msse -msse2 -msse3 -s -pipe -Wno-sign-compare -march=native
+
+GCC=gcc
 BASEDIR=.
 OBJDIR=$(BASEDIR)/obj
 BIN=$(BASEDIR)
 SRCDIR=src
 LIBCINC= -I.
 LIBLINC= -L. 
-LIBLINK= -lm #-lgsl -lgslcblas #-lgmp -lmpfr
+LIBLINK= -lm -pthread
 
-CFLAGS=$(CLFLAGS)  -Wall  $(LIBCINC) 
+CFLAGS=$(CLFLAGS)  -Wall  $(LIBCINC)
 LFLAGS=$(CLFLAGS)  -Wall  $(LIBLINC)
 
 #############################################################################
-#add non-executables .cpp files to OBJS 
-#if .cpp file reside in a dir other than the current one, add .o rule below
-OBJS=$(OBJDIR)/run.o 
 
-#add .cpp files (including executables') to CPPFILES.
-CPPFILES= \
-$(SRCDIR)/run.c \
-$(SRCDIR)/main.c
+LINK_TARGET = run
 
-##############################################################################
-#EXECUTABLES: add executables rules here
+OBJS= $(OBJDIR)/deque.o \
+$(OBJDIR)/io.o \
+$(OBJDIR)/main.o \
+$(OBJDIR)/num_procs.o \
+$(OBJDIR)/out_sorted.o \
+$(OBJDIR)/out3.o \
+$(OBJDIR)/out4.o \
+$(OBJDIR)/out5.o \
+$(OBJDIR)/parse_program_options.o \
+$(OBJDIR)/read_data_context.o \
+$(OBJDIR)/read_scored_index.o \
+$(OBJDIR)/read_tuples_and_scored_index.o \
+$(OBJDIR)/read_scored_tuples.o \
+$(OBJDIR)/read_sorted_index.o \
+$(OBJDIR)/sort_indexed_scores.o \
+$(OBJDIR)/timestamp.o \
+$(OBJDIR)/work.o
 
-all: search 
+REBUILDABLES = $(OBJS) $(LINK_TARGET)
 
-search: $(OBJDIR)/search.oo
-	cp $(OBJDIR)/search.oo $(BIN)/run
+VPATH = src obj
 
-%.oo: %.o $(OBJS) $(LIBS)
-	echo $<
-	$(GPP) $(LFLAGS) -o $@ $(OBJS) $< $(LIBLINK)
+all : $(LINK_TARGET)
+	echo All done
 
-$(OBJDIR)/search.o: $(SRCDIR)/main.c
-	mkdir -p obj
-	$(GPP) $(CFLAGS) -o $(OBJDIR)/search.o -c $(SRCDIR)/main.c
+clean :
+	rm -f $(REBUILDABLES)
+	echo Clean done
 
 
-##############################################################################
-# add non-executables .o rules here
+$(LINK_TARGET) : $(OBJS)
+	gcc -o $@ $^ $(LIBLINK)
 
-$(OBJDIR)/run.o: $(SRCDIR)/run.c $(SRCDIR)/run.h
-	$(GPP) $(CFLAGS) -o $(OBJDIR)/run.o -c $(SRCDIR)/run.c
+%.o : %.c
+	gcc $(CFLAGS) -o $@ -c $<
 
-###############################################################################
-
-clean:
-	@rm -f $(OBJDIR)/*.o $(OBJDIR)/*.oo $(SRCDIR)/*~ 
+$(OBJDIR)/%.o : %.c
+	gcc $(CFLAGS) -o $@ -c $<
