@@ -15,3 +15,8 @@ When cmake is used it builds few testing executables in additions to the run exe
   cstring_score_test - tests correctness of double precision floating value [-1,1] to ascii conversion
   deque_test - tests "deque", or maybe rather single-linked list used to keep value-to-sorted-tuple-index associations
 
+THREADING:
+
+Created executable uses threads. It accepts -t option to pass number of threads to use. This limit, however,
+is used only during data loading and sorting stage. Subsequently, it will use 4 or 5 threads, the latter when
+the -s option is passed. By default, when -t is absent, number of threads will equal number of CPUs.
