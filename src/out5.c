@@ -32,11 +32,47 @@
 #include "score_as_cstring.h"
 #include "cstring_double.h"
 #include "double_as_cstring.h"
+#include "cstring_uint32.h"
+#include "naive_utoa.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <math.h>
+
+//#define USE_PRINTF
+
+
+static inline
+void fast_out_scored_tuple(
+    const size_t DIM,
+    FILE * ofile,
+    const var_t * base_p,
+    const size_t tix,
+    const char * alpha_score_p,
+    const double dist)
+{
+    const size_t vix = tix * DIM;
+    char buf[sizeof ("4294967295") * DIM + sizeof ("-1.1234567890") /*+ sizeof ("-12345678901234567890.1234567890")*/];
+
+    size_t ix = 0;
+    char * p = buf;
+    for (ix = 0; ix < DIM; ++ix)
+    {
+        cstring_uint32_t * cstrp = (cstring_uint32_t *)p;
+        p = naive_utoa(base_p[vix + ix], cstrp);
+        *p++ = '\t';
+    }
+    memcpy(p, alpha_score_p, sizeof (cstring_score_t));
+    p += sizeof ("-1.1234567890") - 1;
+    p -= (*alpha_score_p != '-');
+
+    *p++ = '\t';
+    *p = 0;
+
+    fputs(buf, ofile);
+    fprintf(ofile, "%.10lf\n", dist);
+}
 
 
 static
@@ -47,6 +83,7 @@ void out_scored_tuple2(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 2;
 
     fprintf(ofile, "%u\t%u\t%s\t%.10lf\n",
@@ -54,6 +91,10 @@ void out_scored_tuple2(
         base_p[vix + 1],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(2,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
@@ -65,6 +106,7 @@ void out_scored_tuple3(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 3;
 
     fprintf(ofile, "%u\t%u\t%u\t%s\t%.10lf\n",
@@ -73,6 +115,10 @@ void out_scored_tuple3(
         base_p[vix + 2],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(3,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
@@ -84,6 +130,7 @@ void out_scored_tuple4(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 4;
 
     fprintf(ofile, "%u\t%u\t%u\t%u\t%s\t%.10lf\n",
@@ -93,6 +140,10 @@ void out_scored_tuple4(
         base_p[vix + 3],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(4,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
@@ -104,6 +155,7 @@ void out_scored_tuple5(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 5;
 
     fprintf(ofile, "%u\t%u\t%u\t%u\t%u\t%s\t%.10lf\n",
@@ -114,6 +166,10 @@ void out_scored_tuple5(
         base_p[vix + 4],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(5,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
@@ -125,6 +181,7 @@ void out_scored_tuple6(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 6;
 
     fprintf(ofile, "%u\t%u\t%u\t%u\t%u\t%u\t%s\t%.10lf\n",
@@ -136,6 +193,10 @@ void out_scored_tuple6(
         base_p[vix + 5],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(6,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
@@ -147,6 +208,7 @@ void out_scored_tuple7(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 7;
 
     fprintf(ofile, "%u\t%u\t%u\t%u\t%u\t%u\t%u\t%s\t%.10lf\n",
@@ -159,6 +221,10 @@ void out_scored_tuple7(
         base_p[vix + 6],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(7,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
@@ -170,6 +236,7 @@ void out_scored_tuple8(
     const char * alpha_score_p,
     const double dist)
 {
+#ifdef USE_PRINTF
     const size_t vix = tix * 8;
 
     fprintf(ofile, "%u\t%u\t%u\t%u\t%u\t%u\t%u\t%u\t%s\t%.10lf\n",
@@ -183,6 +250,10 @@ void out_scored_tuple8(
         base_p[vix + 7],
         alpha_score_p,
         dist);
+#else
+    fast_out_scored_tuple(8,
+        ofile, base_p, tix, alpha_score_p, dist);
+#endif
 }
 
 
