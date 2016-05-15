@@ -19,3 +19,7 @@ out4.txt
 out5.txt
 
 cachegrind.out.*
+
+deque_test
+fbstp_test
+utoa_test
