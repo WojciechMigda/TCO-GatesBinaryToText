@@ -175,7 +175,7 @@ typedef void (*out_scored_tuple_fn)(
     const size_t tix,
     const char * alpha_score_p);
 
-static
+
 out_scored_tuple_fn out_scored_tuple_fns[] =
 {
     out_scored_tuple2,
