@@ -24,3 +24,4 @@ deque_test
 fbstp_test
 utoa_test
 cstring_score_test
+naive_utoa_test
