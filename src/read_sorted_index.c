@@ -29,6 +29,7 @@
 #include "span_indexed_score.h"
 #include "span_var.h"
 #include "read_tuples_and_scored_index.h"
+#include "timestamp.h"
 
 
 #include <stddef.h>
@@ -78,11 +79,13 @@ naive_merge_sorted_scores_batches(SPAN(span_indexed_score_t) batches)
 static
 void * sorting_thread(void * p)
 {
+    const uint64_t time0 = timestamp();
+
     SPAN(indexed_score_t) * span_p = (SPAN(indexed_score_t) *)p;
 
     sort_indexed_scores(*span_p);
 
-    fprintf(stderr, "Sorted scores: %p [%zu]\n", (void *)(span_p->ptr), span_p->sz);
+    fprintf(stderr, "Sorted scores: %p [%zu], %zu msec\n", (void *)(span_p->ptr), span_p->sz, timestamp() - time0);
 
     pthread_exit(NULL);
     return NULL;
@@ -287,10 +290,15 @@ read_tuples_and_sorted_index(
             pthread_attr_destroy(&attr);
 
             /* sort last batch */
-            batches[nthreads - 1] = sort_indexed_scores(batches[nthreads - 1]);
+            {
+                const uint64_t time0 = timestamp();
+                batches[nthreads - 1] = sort_indexed_scores(batches[nthreads - 1]);
+                fprintf(stderr, "Last batch sorted in %zu msec\n", timestamp() - time0);
+            }
 
             /* join threads */
             {
+
                 size_t tid = 0;
                 for (tid = 0; tid < (nthreads - 1); ++tid)
                 {
@@ -324,12 +332,15 @@ read_tuples_and_sorted_index(
 //        }
         if (nthreads > 1)
         {
+            const uint64_t time0 = timestamp();
             // http://www.geeksforgeeks.org/merge-k-sorted-arrays/
             // http://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
 
 #warning TODO: naive_merge_sorted_scores_batches
             /* it frees pointers in batches */
             xspan = naive_merge_sorted_scores_batches(MAKE_SPAN(span_indexed_score_t, batches, nthreads));
+
+            fprintf(stderr, "Sorted scores merged in %zu msec\n", timestamp() - time0);
         }
         else
         {

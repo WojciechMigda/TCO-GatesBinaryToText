@@ -11,8 +11,10 @@
 #endif
 
 #include "str_concat.h"
+#include "timestamp.h"
 
 #include <string.h>
+#include <stdio.h>
 
 #define MAKE_FUN_NAME(x) STR_CONCAT2(x, TUPLE_DIM)
 #define MAKE_TUPLE_NAME(p, s) STR_CONCAT3(p, TUPLE_DIM, s)
@@ -31,6 +33,8 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
     enum { CHUNK = 1000 };
 
     typedef MAKE_TUPLE_NAME(scored_tuple_d, _t) scored_tuple_t;
+
+    const uint64_t time0 = timestamp();
 
     size_t cix = 0; /* chunk index */
 
@@ -101,6 +105,8 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
             }
         }
     }
+
+    fprintf(stderr, "Batch of tuples and scores read in %zu msec\n", timestamp() - time0);
 }
 
 #undef MAKE_FUN_NAME
