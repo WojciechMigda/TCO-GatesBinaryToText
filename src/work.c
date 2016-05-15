@@ -27,6 +27,10 @@
 #include "data_context.h"
 #include "owner.h"
 #include "io.h"
+#include "out_sorted.h"
+#include "out3.h"
+#include "out4.h"
+#include "out5.h"
 
 #include "read_sorted_index.h"
 
@@ -35,56 +39,13 @@
 DEFINE_PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t));
 #include "read_tuples_and_sorted_index.h"
 
-#include "quicksort.h"
+#include "deque.h"
+#include "span_deque.h"
 
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdint.h>
-
-
-
-int index_cmp(const void * va_p, const void * vb_p)
-{
-    DEFINE_PAIR(uint32_t, double);
-    typedef PAIR(uint32_t, double) index_entry_t;
-
-    const index_entry_t * a_p = (const index_entry_t *)va_p;
-    const index_entry_t * b_p = (const index_entry_t *)vb_p;
-
-    return a_p->second < b_p->second ?
-        1 : (a_p->second > b_p->second ? -1 :
-            a_p->first < b_p->first ?
-                1 : (a_p->first > b_p->first ? - 1 : 0)
-            );
-}
-
-
-int index_cmp_r(const void * va_p, const void * vb_p, void * vc_p)
-{
-    typedef uint32_t index_entry_t;
-
-    const index_entry_t * a_p = (const index_entry_t *)va_p;
-    const index_entry_t * b_p = (const index_entry_t *)vb_p;
-
-    typedef struct
-    {
-        const uint8_t * data_p;
-        uint32_t d;
-    } ctx_t;
-    const ctx_t * c_p = (const ctx_t *)vc_p;
-
-    const uint32_t ia = *a_p;
-    const uint32_t ib = *b_p;
-    const double da = *(double *)(c_p->data_p + ia * (c_p->d * sizeof (uint32_t) + sizeof (double)) + c_p->d * sizeof (uint32_t));
-    const double db = *(double *)(c_p->data_p + ib * (c_p->d * sizeof (uint32_t) + sizeof (double)) + c_p->d * sizeof (uint32_t));
-
-    return da < db ?
-        1 : (da > db ? -1 :
-            ia < ib ?
-                1 : (ia > ib ? - 1 : 0)
-            );
-}
 
 
 int work(const struct program_options_s * program_options_p)
@@ -103,101 +64,92 @@ int work(const struct program_options_s * program_options_p)
     fprintf(stderr, "Average:\t\t%.10f\n", data_ctx.average);
 
 
-//    SPAN(indexed_score_t) indexed_score = read_sorted_index(program_options_p->in_file2, data_ctx.n_tuples, data_ctx.d, program_options_p->nthreads);
-//    free(indexed_score.ptr);
+    double sum_sq = 0.;
+
+    SPAN(deque_t) var_to_tupix = NULL_SPAN(deque_t);
+    {
+        deque_t * data_p = malloc(sizeof (deque_t) * data_ctx.n_vars);
+        if (data_p == NULL)
+        {
+            fprintf(stderr, "Could not allocate space for var-to-tuple-index mapping, needed %zu bytes\n", sizeof (deque_t) * data_ctx.n_vars);
+            return -1;
+        }
+
+        size_t ix = 0;
+        for (ix = 0; ix < data_ctx.n_vars; ++ix)
+        {
+            data_p[ix] = new_deque();
+        }
+        var_to_tupix = MAKE_SPAN(deque_t, data_p, data_ctx.n_vars);
+    }
+
 
     PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t)) tuples_and_indexed_score =
-        read_tuples_and_sorted_index(program_options_p->in_file2, data_ctx.n_tuples, data_ctx.d, program_options_p->nthreads);
+        read_tuples_and_sorted_index(
+            program_options_p->in_file2,
+            data_ctx.n_tuples,
+            data_ctx.d,
+            program_options_p->nthreads,
+            data_ctx.average,
+            &sum_sq
+            //, var_to_tupix
+            );
+
+    /* we need this for average scores per variable */
+    build_var_to_tupix(
+        var_to_tupix,
+        tuples_and_indexed_score.second,
+        tuples_and_indexed_score.first,
+        data_ctx.d);
+
+    out1(
+        tuples_and_indexed_score.second,
+        tuples_and_indexed_score.first,
+        data_ctx.d,
+        program_options_p->n,
+        program_options_p->nthreads);
+
+    out2(
+        tuples_and_indexed_score.second,
+        tuples_and_indexed_score.first,
+        data_ctx.d,
+        program_options_p->n,
+        program_options_p->nthreads);
+
+    out3(
+        tuples_and_indexed_score.second,
+        tuples_and_indexed_score.first,
+        var_to_tupix,
+        data_ctx.d,
+        program_options_p->k,
+        program_options_p->nthreads);
+
+    out4(tuples_and_indexed_score.second, program_options_p->b, program_options_p->nthreads);
+
+    if (OPTION_TYPE_IS_SOME(program_options_p->maybe_s))
+    {
+        out5(
+            tuples_and_indexed_score.second,
+            tuples_and_indexed_score.first,
+            data_ctx.d,
+            data_ctx.average,
+            sum_sq,
+            OPTION_TYPE_VALUE(program_options_p->maybe_s),
+            program_options_p->nthreads);
+    }
+
     free(tuples_and_indexed_score.first.ptr);
     free(tuples_and_indexed_score.second.ptr);
 
-    return 0;
-
-
-
-
-
-    const SPAN(void) scored_tuples = program_options_p->scored_tuples_reader(program_options_p->in_file2);
-
-
-
-    // build index
+    if (var_to_tupix.ptr != NULL)
     {
-        DEFINE_PAIR(uint32_t, double);
-        typedef PAIR(uint32_t, double) index_entry_t;
-        DEFINE_SPAN(index_entry_t);
-
-        SPAN(index_entry_t) foo[2];
-
+        size_t ix = 0;
+        for (ix = 0; ix < var_to_tupix.sz; ++ix)
         {
-            void * p = malloc(data_ctx.n_tuples * sizeof (index_entry_t));
-            SPAN(index_entry_t) index = MAKE_SPAN(index_entry_t, p, data_ctx.n_tuples);
-            size_t ix = 0;
-            for (ix = 0; ix < data_ctx.n_tuples; ++ix)
-            {
-                const uint8_t * data_p = (const uint8_t *)scored_tuples.ptr;
-                data_p += ix * (data_ctx.d * sizeof (uint32_t) + sizeof (double));
-                index.ptr[ix].first = ix;
-                index.ptr[ix].second = *((double *)(data_p + data_ctx.d * sizeof (uint32_t)));
-            }
-
-            qsort(index.ptr, index.sz, sizeof (index_entry_t), index_cmp);
-
-            foo[0] = index;
+//            fprintf(stdout, "var %zu in %zu tuples\n", ix, var_to_tupix.ptr[ix].nelem);
+            deque_free(&var_to_tupix.ptr[ix]);
         }
-        {
-            void * p = malloc(data_ctx.n_tuples * sizeof (index_entry_t));
-            SPAN(index_entry_t) index = MAKE_SPAN(index_entry_t, p, data_ctx.n_tuples);
-            size_t ix = 0;
-            for (ix = 0; ix < data_ctx.n_tuples; ++ix)
-            {
-                const uint8_t * data_p = (const uint8_t *)scored_tuples.ptr;
-                data_p += ix * (data_ctx.d * sizeof (uint32_t) + sizeof (double));
-                index.ptr[ix].first = ix;
-                index.ptr[ix].second = *((double *)(data_p + data_ctx.d * sizeof (uint32_t)));
-            }
-
-            QUICK_SORT(index.ptr, index.sz);
-            foo[1] = index;
-        }
-
-        size_t ix;
-        for (ix = 0; ix < data_ctx.n_tuples; ++ix)
-        {
-            if (foo[0].ptr[ix].first != foo[1].ptr[ix].first)
-            {
-                printf("%zu %lf %lf\n", ix, foo[0].ptr[ix].second, foo[1].ptr[ix].second);
-            }
-        }
-
-        free(foo[0].ptr);
-        free(foo[1].ptr);
-    }
-//    {
-//        typedef uint32_t index_entry_t;
-//        void * p = malloc(data_ctx.n_tuples * sizeof (index_entry_t));
-//        DEFINE_SPAN(index_entry_t);
-//        SPAN(index_entry_t) index = MAKE_SPAN(index_entry_t, p, data_ctx.n_tuples);
-//        size_t ix = 0;
-//        for (ix = 0; ix < data_ctx.n_tuples; ++ix)
-//        {
-//            const uint8_t * data_p = (const uint8_t *)scored_tuples.ptr;
-//            data_p += ix * (data_ctx.d * sizeof (uint32_t) + sizeof (double));
-//            index.ptr[ix] = ix;
-//        }
-//
-//        struct ctx_s
-//        {
-//            const uint8_t * data_p;
-//            uint32_t d;
-//        } ctx = {/*(const uint8_t *)*/scored_tuples.ptr, data_ctx.d};
-//        qsort_r(index.ptr, index.sz, sizeof (index_entry_t), index_cmp_r, &ctx);
-//    }
-
-
-    if (program_options_p->scored_tuples_deleter(scored_tuples) < 0)
-    {
-        return -1;
+        free(var_to_tupix.ptr);
     }
 
     return 0;
