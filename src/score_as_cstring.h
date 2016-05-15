@@ -57,6 +57,8 @@ void score_as_cstring(const double score, cstring_score_t * out_p)
     char * p = &(*out_p)[0];
     if (UNLIKELY(frac == 0.5 || frac == -0.5))
     {
+        /* this is the case where rounding rules differ between *printf
+         * and the rest of the world*/
         snprintf(p, sizeof (*out_p), "%.10lf", score);
     }
     else
