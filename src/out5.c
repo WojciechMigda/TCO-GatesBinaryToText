@@ -31,7 +31,7 @@
 #include "cstring_score.h"
 #include "score_as_cstring.h"
 //#include "cstring_double.h"
-#include "double_as_cstring.h"
+//#include "double_as_cstring.h"
 #include "cstring_uint32.h"
 #include "naive_utoa.h"
 
