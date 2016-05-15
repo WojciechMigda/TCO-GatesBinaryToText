@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2016 Wojciech Migda
  * All rights reserved
- * Distributed under the terms of the GNU LGPL v3
+ * Distributed under the terms of the MIT License
  *******************************************************************************
  *
  * Filename: owner.h
