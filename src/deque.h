@@ -37,7 +37,7 @@ extern "C"
 {
 #endif
 
-static const NULL_DEQUE = {0u, NULL, NULL}
+static const deque_t NULL_DEQUE = {0u, NULL, NULL};
 
 static inline
 deque_t new_deque(void)

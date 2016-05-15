@@ -26,6 +26,7 @@
 #include "bool.h"
 #include "tuple_ix_type.h"
 #include "span_tuple_ix.h"
+#include "min_max.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -103,14 +104,18 @@ deque_as_span(const struct deque_s * self)
     else
     {
         deque_piece_t * this_p = self->head_p;
-        size_t ndone = 0;
+
+        size_t to_copy = self->nelem;
 
         while (this_p != NULL)
         {
             deque_piece_t * next_p = this_p->next_p;
 
-            memcpy(&data_p[ndone], this_p, DEQUE_PIECE_NELEM * sizeof (tuple_ix_t));
-            ndone += DEQUE_PIECE_NELEM;
+            const size_t batch_sz = MIN(DEQUE_PIECE_NELEM, to_copy);
+
+            memcpy(&data_p[self->nelem - to_copy], this_p->data, batch_sz * sizeof (tuple_ix_t));
+
+            to_copy -= batch_sz;
 
             this_p = next_p;
         };
