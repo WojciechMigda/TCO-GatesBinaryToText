@@ -30,7 +30,7 @@ extern "C"
 {
 #endif
 
-typedef char (cstring_uint32_t)[1 + sizeof ("4294967295")];
+typedef char (cstring_uint32_t)[sizeof ("4294967295")];
 
 #ifdef __cplusplus
 }
