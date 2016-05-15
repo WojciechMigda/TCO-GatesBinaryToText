@@ -47,8 +47,9 @@ read_tuples_and_sorted_index(
     size_t tup_dim,
     int nthreads,
     const double mean,
-    double * sum_sq,
-    SPAN(deque_t) var_to_tupix);
+    double * sum_sq
+    //, SPAN(deque_t) var_to_tupix
+    );
 
 
 #ifdef __cplusplus

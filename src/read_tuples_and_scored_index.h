@@ -47,8 +47,8 @@ read_tuples_and_scored_index_batch(
     const size_t end,
     SPAN(var_t) vspan,
     double * sum_sq,
-    const double mean,
-    SPAN(deque_t) var_to_tupix
+    const double mean
+    //, SPAN(deque_t) var_to_tupix
     );
 
 #ifdef __cplusplus
