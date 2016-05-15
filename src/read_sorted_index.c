@@ -30,6 +30,7 @@
 #include "span_var.h"
 #include "read_tuples_and_scored_index.h"
 #include "timestamp.h"
+#include "span_deque.h"
 
 
 #include <stddef.h>
@@ -69,8 +70,6 @@ naive_merge_sorted_scores_batches(SPAN(span_indexed_score_t) batches)
     }
 
     qsort(combined_p, total_sz, sizeof (batches.ptr[0].ptr[0]), cmp_indexed_score_by_score_asc);
-//    void _quicksort (void *const pbase, size_t total_elems, size_t size, int (*cmp)(const void *, const void *), void *arg);
-//    _quicksort(combined_p, total_sz, sizeof (batches.ptr[0].ptr[0]), cmp_indexed_score_by_score_asc, NULL);
 
     return MAKE_SPAN(indexed_score_t, combined_p, total_sz);
 }
@@ -164,20 +163,6 @@ SPAN(indexed_score_t) read_sorted_index(
             batches[0] = sort_indexed_scores(batches[0]);
         }
 
-        /// TEST
-//        {
-//            size_t ix = 0;
-//            for (ix = 0; ix < nthreads; ++ix)
-//            {
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[0].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[1].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[2].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 3].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 2].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 1].second);
-//                fprintf(stderr, "\n");
-//            }
-//        }
         if (nthreads > 1)
         {
             // http://www.geeksforgeeks.org/merge-k-sorted-arrays/
@@ -191,13 +176,6 @@ SPAN(indexed_score_t) read_sorted_index(
             retspan = batches[0];
             batches[0].ptr = NULL;
         }
-
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[0].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[1].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[2].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 3].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 2].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 1].second);
 
     } while (0);
 
@@ -226,7 +204,8 @@ read_tuples_and_sorted_index(
     size_t tup_dim,
     int nthreads,
     const double mean,
-    double * sum_sq)
+    double * sum_sq,
+    SPAN(deque_t) var_to_tupix)
 {
     SPAN(indexed_score_t) batches[nthreads];
     SPAN(indexed_score_t) xspan = NULL_SPAN(indexed_score_t);
@@ -262,7 +241,7 @@ read_tuples_and_sorted_index(
         /* read first batch */
         batches[0] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[0], positions[1],
             MAKE_SPAN(var_t, (var_t *)vars_p + positions[0] * tup_dim, (positions[1] - positions[0]) * tup_dim),
-            sum_sq, mean);
+            sum_sq, mean, var_to_tupix);
 
         if (nthreads > 1)
         {
@@ -283,7 +262,7 @@ read_tuples_and_sorted_index(
                     }
                     batches[tid] = read_tuples_and_scored_index_batch(fname, tup_dim, positions[tid], positions[tid + 1],
                         MAKE_SPAN(var_t, (var_t *)vars_p + positions[tid] * tup_dim, (positions[tid + 1] - positions[tid]) * tup_dim),
-                        sum_sq, mean);
+                        sum_sq, mean, var_to_tupix);
                 }
             }
 
@@ -316,20 +295,6 @@ read_tuples_and_sorted_index(
             batches[0] = sort_indexed_scores(batches[0]);
         }
 
-        /// TEST
-//        {
-//            size_t ix = 0;
-//            for (ix = 0; ix < nthreads; ++ix)
-//            {
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[0].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[1].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[2].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 3].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 2].second);
-//                fprintf(stderr, "batch %zu    %lf\n", ix, batches[ix].ptr[batches[ix].sz - 1].second);
-//                fprintf(stderr, "\n");
-//            }
-//        }
         if (nthreads > 1)
         {
             const uint64_t time0 = timestamp();
@@ -347,13 +312,6 @@ read_tuples_and_sorted_index(
             xspan = batches[0];
             batches[0].ptr = NULL;
         }
-
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[0].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[1].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[2].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 3].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 2].second);
-//        fprintf(stderr, "batch     %lf\n", retspan.ptr[retspan.sz - 1].second);
 
         vspan = MAKE_SPAN(var_t, vars_p, ntuples * tup_dim);
         vars_p = NULL;

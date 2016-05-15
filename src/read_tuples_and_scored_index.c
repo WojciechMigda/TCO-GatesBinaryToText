@@ -28,6 +28,8 @@
 #include "span_indexed_score.h"
 #include "var_type.h"
 #include "read_tuples_and_scored_index.h"
+#include "span_deque.h"
+
 
 #include <stddef.h>
 #include <stdio.h>
@@ -63,7 +65,8 @@ typedef void (*read_tuples_and_scored_index_sub_t)(
     const size_t begin,
     const size_t end,
     double * sum_sq,
-    const double mean);
+    const double mean,
+    SPAN(deque_t) var_to_tupix);
 
 const read_tuples_and_scored_index_sub_t read_tuples_and_scored_index_sub[] =
 {
@@ -85,7 +88,8 @@ read_tuples_and_scored_index_batch(
     const size_t end,
     SPAN(var_t) vspan,
     double * sum_sq,
-    const double mean
+    const double mean,
+    SPAN(deque_t) var_to_tupix
     )
 {
     FILE * ifile = NULL;
@@ -117,7 +121,7 @@ read_tuples_and_scored_index_batch(
         }
 
 
-        read_tuples_and_scored_index_sub[tup_dim - 2](scores_p, vspan.ptr, ifile, begin, end, sum_sq, mean);
+        read_tuples_and_scored_index_sub[tup_dim - 2](scores_p, vspan.ptr, ifile, begin, end, sum_sq, mean, var_to_tupix);
 
 
         xspan = MAKE_SPAN(indexed_score_t, scores_p, end - begin);

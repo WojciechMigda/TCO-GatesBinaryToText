@@ -12,6 +12,8 @@
 
 #include "str_concat.h"
 #include "timestamp.h"
+#include "span_deque.h"
+#include "deque.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -27,7 +29,8 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
     const size_t begin,
     const size_t end,
     double * sum_sq,
-    const double mean
+    const double mean,
+    SPAN(deque_t) var_to_tupix
     )
 {
     enum { CHUNK = 1000 };
@@ -60,21 +63,13 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
         }
         for (bix = 0; bix < CHUNK; ++bix)
         {
-            /* SEGFAULT ALERT:
-             * There's a bug in my compiler (5.2.1) which generates assembler
-             * which for TUPLE_DIM == 4 reads xmm register from address not
-             * aligned on 16 bytes */
-            if (TUPLE_DIM < 4)
+            size_t vix = 0;
+            for (vix = 0; vix < TUPLE_DIM; ++vix)
             {
-                size_t vix = 0;
-                for (vix = 0; vix < TUPLE_DIM; ++vix)
-                {
-                    tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = buf[bix].var[vix];
-                }
-            }
-            else
-            {
-                memcpy(&tup_p[TUPLE_DIM * (cix + bix - begin)], buf[bix].var, sizeof (buf[bix].var));
+                const var_t v = buf[bix].var[vix];
+
+                tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = v;
+                deque_push_back(&var_to_tupix.ptr[v], cix + bix);
             }
         }
     }
@@ -97,11 +92,16 @@ void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
             const double score = buf[bix].score;
             *sum_sq += (score - mean) * (score - mean);
             score_p[cix + bix - begin] = (indexed_score_t){cix + bix, score};
-
+        }
+        for (bix = 0; bix < (end - cix); ++bix)
+        {
             size_t vix = 0;
             for (vix = 0; vix < TUPLE_DIM; ++vix)
             {
-                tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = buf[bix].var[vix];
+                const var_t v = buf[bix].var[vix];
+
+                tup_p[TUPLE_DIM * (cix + bix - begin) + vix] = v;
+                deque_push_back(&var_to_tupix.ptr[v], cix + bix);
             }
         }
     }
