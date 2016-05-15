@@ -27,6 +27,7 @@
 #include "span_tuple_ix.h"
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #undef NDEBUG
 #include <assert.h>
