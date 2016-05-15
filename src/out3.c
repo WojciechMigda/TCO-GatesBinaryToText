@@ -104,7 +104,7 @@ void out3(
 
         if (indexed_scores.sz == 0)
         {
-            fprintf(stderr, "[out5] there is no data to process\n");
+            fprintf(stderr, "[out3] there is no data to process\n");
             break;
         }
 
