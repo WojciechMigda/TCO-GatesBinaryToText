@@ -7,7 +7,10 @@
  * Filename: out_sorted.c
  *
  * Description:
- *      description
+ *      Calculate and output contents of files out1.txt and out2.txt
+ *      Algorithms are pretty straightforward once data structures are
+ *      explained. It is just traversing ordered array of index/score pairs
+ *      and then retrieving associated variable data
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -39,6 +42,15 @@
 
 //#define USE_PRINTF
 
+/*
+ * optimized function which outputs scored tuple line to the file stream
+ *
+ * DIM - tuple dimension
+ * ofile - output file stream
+ * base_p - pointer to array with variables, part of scored tuples
+ * tix - index of tuple
+ * alpha_score_p - ascii representation of tuple score
+ */
 static inline
 void fast_out_scored_tuple(
     const size_t DIM,
@@ -67,6 +79,10 @@ void fast_out_scored_tuple(
     fputs(buf, ofile);
 }
 
+/*
+ * functions to output lines with scored tuples tailored for
+ * specific tuple sizes
+ */
 
 static
 void out_scored_tuple2(
@@ -255,6 +271,15 @@ out_scored_tuple_fn out_scored_tuple_fns[] =
 };
 
 
+/*
+ * Compute and output contents of file out2.txt
+ *
+ * indexed_scores - array of sorted pairs (tuple index, score)
+ * tuples - unsorted tuples (only variable part)
+ * tup_dim - tuple dimension
+ * n_tup - number of tuples to output
+ * nthreads - unused
+ */
 void out2(
     SPAN(indexed_score_t) indexed_scores,
     SPAN(var_t) tuples,
@@ -319,6 +344,15 @@ void out2(
 }
 
 
+/*
+ * Compute and output contents of file out1.txt
+ *
+ * indexed_scores - array of sorted pairs (tuple index, score)
+ * tuples - unsorted tuples (only variable part)
+ * tup_dim - tuple dimension
+ * n_tup - number of tuples to output
+ * nthreads - unused
+ */
 void out1(
     SPAN(indexed_score_t) indexed_scores,
     SPAN(var_t) tuples,

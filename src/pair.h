@@ -7,7 +7,7 @@
  * Filename: pair.h
  *
  * Description:
- *      description
+ *      C version of std::pair<T>
  *
  * Authors:
  *          Wojciech Migda (wm)

@@ -7,7 +7,9 @@
  * Filename: deque.h
  *
  * Description:
- *      description
+ *      Deque operations
+ *      "Deque" is a singly linked list of arrays of indices of sorted scored
+ *      tuples.
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -39,6 +41,9 @@ extern "C"
 
 static const deque_t NULL_DEQUE = {0u, NULL, NULL};
 
+/*
+ * Create new empty deque
+ */
 static inline
 deque_t new_deque(void)
 {

@@ -7,7 +7,7 @@
  * Filename: option_type.h
  *
  * Description:
- *      description
+ *      Generic option type, see wikipedia
  *
  * Authors:
  *          Wojciech Migda (wm)

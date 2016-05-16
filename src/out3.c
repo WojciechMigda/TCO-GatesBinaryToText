@@ -7,7 +7,7 @@
  * Filename: out3.c
  *
  * Description:
- *      description
+ *      Compute and output out3.txt file
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -37,6 +37,14 @@
 #include <stdlib.h>
 
 
+/*
+ * Build mapping between variables and indexes of sorted scored tuples
+ *
+ * The overall scheme is:
+ * variable -> index of score/tuple index pair -> tuple
+ *
+ * Thus, for every variable we have access to sorted scores and associated tuple
+ */
 void build_var_to_tupix(
     SPAN(deque_t) var_to_tupix,
     SPAN(indexed_score_t) indexed_scores,
@@ -75,6 +83,17 @@ typedef void (*out_scored_tuple_fn)(
 /* lame, should go to a header shared with out_scored.c */
 extern out_scored_tuple_fn out_scored_tuple_fns[];
 
+/*
+ * Compute and output contents of file out3.txt
+ * Algorithm is pretty straightforward once the data structures are explained
+ *
+ * indexed_scores - array of sorted pairs (tuple index, score)
+ * tuples - unsorted tuples (only variable part)
+ * var_to_tupix - mapping between variables and sorted scored tuples indices
+ * tup_dim - tuple dimension
+ * k - k parameter
+ * nthreads - unused
+ */
 void out3(
     SPAN(indexed_score_t) indexed_scores,
     SPAN(var_t) tuples,
@@ -134,6 +153,12 @@ void out3(
 
             for (spix = 0; spix < real_k; ++spix)
             {
+                /*
+                 * 1. Retrieve index of sorted scored tuple (ssix)
+                 * 2. Retrieve score (partt of the pair under ssix)
+                 * 3. Retrieve index of tuple (also in the pair)
+                 * 4. output line to the file
+                 */
                 const size_t ssix = tupix.ptr[spix];
                 const double score = indexed_scores.ptr[ssix].second;
                 const size_t tix = indexed_scores.ptr[ssix].first;
@@ -145,6 +170,9 @@ void out3(
 
             for (spix = 0; spix < real_k; ++spix)
             {
+                /*
+                 * As in the previous loop, but in opposite direction
+                 */
                 const size_t ssix = tupix.ptr[tupix.sz - 1 - spix];
                 const double score = indexed_scores.ptr[ssix].second;
                 const size_t tix = indexed_scores.ptr[ssix].first;

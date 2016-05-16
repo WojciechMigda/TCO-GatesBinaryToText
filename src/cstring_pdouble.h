@@ -7,7 +7,8 @@
  * Filename: cstring_pdouble.h
  *
  * Description:
- *      description
+ *      Convert positive double float value [0.0, MAX_PDOUBLE) to ascii
+ *      representation
  *
  * Authors:
  *          Wojciech Migda (wm)

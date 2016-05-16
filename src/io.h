@@ -7,7 +7,7 @@
  * Filename: io.h
  *
  * Description:
- *      description
+ *      Common file IO operations
  *
  * Authors:
  *          Wojciech Migda (wm)

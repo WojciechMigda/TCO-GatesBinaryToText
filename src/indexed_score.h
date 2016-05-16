@@ -7,7 +7,7 @@
  * Filename: indexed_score.h
  *
  * Description:
- *      description
+ *      Pair of tuple index and corresponding score
  *
  * Authors:
  *          Wojciech Migda (wm)

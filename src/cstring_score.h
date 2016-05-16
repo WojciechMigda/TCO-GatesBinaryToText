@@ -7,7 +7,8 @@
  * Filename: cstring_score.h
  *
  * Description:
- *      description
+ *      Convert double float in range[-1.0, 1.0] to ascii representation.
+ *      Used mainly for tuple scores (hence the name)
  *
  * Authors:
  *          Wojciech Migda (wm)

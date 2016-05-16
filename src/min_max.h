@@ -7,7 +7,7 @@
  * Filename: min_max.h
  *
  * Description:
- *      description
+ *      MIN and MAX macros, need type checking, though
  *
  * Authors:
  *          Wojciech Migda (wm)

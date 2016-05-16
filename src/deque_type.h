@@ -7,7 +7,7 @@
  * Filename: deque_type.h
  *
  * Description:
- *      description
+ *      Deque type definition
  *
  * Authors:
  *          Wojciech Migda (wm)

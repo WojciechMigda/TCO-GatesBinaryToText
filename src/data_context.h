@@ -7,7 +7,7 @@
  * Filename: data_context.h
  *
  * Description:
- *      description
+ *      Data context as read from in1.bin file
  *
  * Authors:
  *          Wojciech Migda (wm)

@@ -7,7 +7,17 @@
  * Filename: out5.c
  *
  * Description:
- *      description
+ *      Compute and output out5.txt file
+ *
+ *      Algorithm is almost an exact copy of the provided template, except
+ *      that it works on data already in memory and that the standard deviation
+ *      is passed to it instead of being calculated in place.
+ *      The reason for not calculating std dev here is that here out tuple
+ *      scores are already sorted, and this the numerical instability at the
+ *      10-digit printf format is sufficient to cause rounding errors.
+ *      Value of summed squared deviations passed to this function is calculated
+ *      on unsorted data and leads to results exactly the same as in the
+ *      reference files.
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -332,6 +342,14 @@ out_scored_tuple_fn out_scored_tuple_fns[] =
 
 /*
  * compute contents and output out5.txt file
+ *
+ * indexed_scores - array of sorted pairs (tuple index, score)
+ * tuples - unsorted tuples (only variable part)
+ * tup_dim - tuple dimension
+ * mean - average score value for all tuples
+ * sum_sq - sum of squared deviations for all tuples
+ * s - number of standard deviations
+ * nthreads - unused
  */
 void out5(
     SPAN(indexed_score_t) indexed_scores,

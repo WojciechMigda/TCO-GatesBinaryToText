@@ -7,7 +7,7 @@
  * Filename: out4.c
  *
  * Description:
- *      description
+ *      Compute and output out4.txt file
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -31,6 +31,13 @@
 #include <stddef.h>
 #include <math.h>
 
+/*
+ * Compute and output out4.txt file
+ *
+ * indexed_scores - array of sorted pairs (tuple index, score)
+ * bucket_sz - size_of the bucket
+ * nthreads - unused
+ */
 void out4(
     SPAN(indexed_score_t) indexed_scores,
     const double bucket_sz,

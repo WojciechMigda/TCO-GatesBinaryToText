@@ -7,7 +7,8 @@
  * Filename: likely.h
  *
  * Description:
- *      description
+ *      LIKELY and LIKELY macros which utilize GCC extension to hint
+ *      branch probability
  *
  * Authors:
  *          Wojciech Migda (wm)

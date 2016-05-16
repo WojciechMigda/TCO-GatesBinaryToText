@@ -7,7 +7,8 @@
  * Filename: num_procs.h
  *
  * Description:
- *      description
+ *      Query number of available processors,
+ *      `man get_nprocs`
  *
  * Authors:
  *          Wojciech Migda (wm)

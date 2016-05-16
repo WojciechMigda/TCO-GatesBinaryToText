@@ -7,7 +7,7 @@
  * Filename: make_str.h
  *
  * Description:
- *      description
+ *      Preprocesor helpers for sting literal concatenation
  *
  * Authors:
  *          Wojciech Migda (wm)

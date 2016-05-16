@@ -7,7 +7,7 @@
  * Filename: out3.h
  *
  * Description:
- *      description
+ *      Compute and output out3.txt file
  *
  * Authors:
  *          Wojciech Migda (wm)

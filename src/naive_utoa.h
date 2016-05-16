@@ -7,7 +7,9 @@
  * Filename: naive_utoa.h
  *
  * Description:
- *      description
+ *      Naive 32-bit unsigned int to ascii conversion,
+ *      Still faster that *printf,
+ *      Terje's algorithm would be even faster
  *
  * Authors:
  *          Wojciech Migda (wm)

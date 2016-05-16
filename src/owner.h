@@ -7,7 +7,7 @@
  * Filename: owner.h
  *
  * Description:
- *      description
+ *      Macro to mimic owner<T> template from C++ core guidelines
  *
  * Authors:
  *          Wojciech Migda (wm)

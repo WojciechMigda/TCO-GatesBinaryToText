@@ -7,7 +7,7 @@
  * Filename: out_sorted.h
  *
  * Description:
- *      description
+ *      Calculate and output contents of files out1.txt and out2.txt
  *
  * Authors:
  *          Wojciech Migda (wm)

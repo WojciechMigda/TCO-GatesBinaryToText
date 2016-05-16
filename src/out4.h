@@ -7,7 +7,7 @@
  * Filename: out4.h
  *
  * Description:
- *      description
+ *      Compute and output out4.txt file
  *
  * Authors:
  *          Wojciech Migda (wm)

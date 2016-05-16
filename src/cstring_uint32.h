@@ -7,7 +7,7 @@
  * Filename: cstring_uint32.h
  *
  * Description:
- *      description
+ *      Convert 32-bit unsigned int to ascii representation
  *
  * Authors:
  *          Wojciech Migda (wm)

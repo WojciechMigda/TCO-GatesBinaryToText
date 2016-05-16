@@ -7,7 +7,7 @@
  * Filename: io.c
  *
  * Description:
- *      description
+ *      Common file IO operations
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -25,6 +25,9 @@
 #include <stdio.h>
 
 
+/*
+ * Query file stream size
+ */
 size_t fsize(FILE * ifile)
 {
     const size_t prior_pos = ftell(ifile);

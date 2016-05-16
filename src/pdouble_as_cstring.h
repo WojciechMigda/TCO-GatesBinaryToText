@@ -7,7 +7,7 @@
  * Filename: pdouble_as_cstring.h
  *
  * Description:
- *      description
+ *      Convert positive double floating point value to ascii representation
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -95,7 +95,6 @@ void pdouble_as_cstring(const double dbl, cstring_pdouble_t * out_p)
     }
     else
     {
-memset(p, '#', 18);
         naive_ultoa_padded17(magic.l, p);
 
         char * wp = p + 1;

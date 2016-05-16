@@ -7,7 +7,9 @@
  * Filename: deque.c
  *
  * Description:
- *      description
+ *      Deque operations
+ *      "Deque" is a singly linked list of arrays of indices of sorted scored
+ *      tuples.
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -33,11 +35,18 @@
 #include <string.h>
 
 
+/*
+ * check if deque is empty
+ */
 static bool_t deque_is_empty(const struct deque_s * self)
 {
     return (self->head_p == NULL) && (self->tail_p == NULL) ? True : False;
 }
 
+
+/*
+ * allocate new deque element
+ */
 deque_piece_t * deque_new_piece(void)
 {
     deque_piece_t * piece_p = malloc(sizeof (deque_piece_t));
@@ -53,6 +62,9 @@ deque_piece_t * deque_new_piece(void)
 }
 
 
+/*
+ * extend deque with new element to fit another value
+ */
 static void deque_extend(struct deque_s * self)
 {
     deque_piece_t * piece_p = deque_new_piece();
@@ -73,6 +85,9 @@ static void deque_extend(struct deque_s * self)
 }
 
 
+/*
+ * add new value to the deque
+ */
 void deque_push_back(struct deque_s * self, const tuple_ix_t what)
 {
     const size_t tail_nelem = self->nelem % DEQUE_PIECE_NELEM;
@@ -87,6 +102,10 @@ void deque_push_back(struct deque_s * self, const tuple_ix_t what)
 }
 
 
+/*
+ * convert deque to continuous array of values, caller owns the allocated
+ * pointer
+ */
 SPAN(tuple_ix_t)
 deque_as_span(const struct deque_s * self)
 {
@@ -125,6 +144,9 @@ deque_as_span(const struct deque_s * self)
 }
 
 
+/*
+ * free deque and all resources which belong to it
+ */
 void deque_free(struct deque_s * self)
 {
     deque_piece_t * this_p = self->head_p;
