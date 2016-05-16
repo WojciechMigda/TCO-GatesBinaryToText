@@ -7,7 +7,7 @@
  * Filename: span_tuple_ix.h
  *
  * Description:
- *      description
+ *      Definition of span on tuple indices
  *
  * Authors:
  *          Wojciech Migda (wm)

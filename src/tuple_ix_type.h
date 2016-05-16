@@ -7,7 +7,7 @@
  * Filename: tuple_ix_type.h
  *
  * Description:
- *      description
+ *      Typedef for tuple index
  *
  * Authors:
  *          Wojciech Migda (wm)

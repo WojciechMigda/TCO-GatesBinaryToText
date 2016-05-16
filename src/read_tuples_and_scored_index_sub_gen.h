@@ -21,6 +21,9 @@
 #define MAKE_FUN_NAME(x) STR_CONCAT2(x, TUPLE_DIM)
 #define MAKE_TUPLE_NAME(p, s) STR_CONCAT3(p, TUPLE_DIM, s)
 
+/*
+ * Core tuple reading routine
+ */
 static
 void MAKE_FUN_NAME(read_tuples_and_scored_index_sub_d)(
     indexed_score_t * __restrict__ score_p,

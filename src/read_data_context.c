@@ -7,7 +7,7 @@
  * Filename: read_data_context.c
  *
  * Description:
- *      description
+ *      Read data context from specified binary file
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -32,7 +32,7 @@
 /**
  * Read contents of the data context file.
  *
- * On failure the dummy field will be set to 1.
+ * On failure the dummy field will be set to BAD_CONTEXT_MARKER.
  */
 data_context_t read_data_context(const char * fname)
 {

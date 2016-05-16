@@ -7,7 +7,7 @@
  * Filename: read_data_context.h
  *
  * Description:
- *      description
+ *      Read data context from specified binary file
  *
  * Authors:
  *          Wojciech Migda (wm)

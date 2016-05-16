@@ -7,7 +7,7 @@
  * Filename: var_type.h
  *
  * Description:
- *      description
+ *      Typedef for variable type
  *
  * Authors:
  *          Wojciech Migda (wm)

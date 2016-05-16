@@ -7,7 +7,7 @@
  * Filename: read_scored_index.c
  *
  * Description:
- *      description
+ *      Read batch of scored tuples from file
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+/* Here I generate specific functions tailored for given tuple dimension */
 #define TUPLE_DIM 2
 #include "read_scored_index_sub_gen.h"
 
@@ -73,6 +73,9 @@ const read_scored_index_sub_t read_scored_index_sub[] =
 };
 
 
+/*
+ * Read batch of scored indices, overall this is dead code, unused
+ */
 SPAN(indexed_score_t) read_scored_index_batch(
     const char * fname,
     const size_t tup_dim,

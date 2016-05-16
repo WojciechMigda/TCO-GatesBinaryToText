@@ -7,7 +7,8 @@
  * Filename: span.h
  *
  * Description:
- *      description
+ *      This is C macro-based version of span<T> known from C++ core support
+ *      guidelines
  *
  * Authors:
  *          Wojciech Migda (wm)

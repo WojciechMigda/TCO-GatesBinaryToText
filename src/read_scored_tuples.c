@@ -7,7 +7,7 @@
  * Filename: read_scored_tuples.c
  *
  * Description:
- *      description
+ *      Unused code
  *
  * Authors:
  *          Wojciech Migda (wm)

@@ -40,6 +40,10 @@ extern "C"
 #endif
 
 
+/*
+ * Naive 64-bit unsigned int to ascii conversion, left-padded with '0's to
+ * a width of 17 characters
+ */
 static inline
 size_t naive_ultoa_padded17(uint64_t v, char * p)
 {
@@ -70,6 +74,10 @@ size_t naive_ultoa_padded17(uint64_t v, char * p)
 }
 
 
+/*
+ * Convert positive double floating value (less than MAX_PDOUBLE) to an ascii
+ * representation
+ */
 static inline
 void pdouble_as_cstring(const double dbl, cstring_pdouble_t * out_p)
 {
@@ -81,6 +89,7 @@ void pdouble_as_cstring(const double dbl, cstring_pdouble_t * out_p)
 
     const double dbl10 = dbl * 1e10;
 
+    /* Extract mantissa, well known trick */
     magic.d = dbl10 + 6755399441055744.0;
     magic.l <<= 13;
     magic.l >>= 13;
@@ -97,6 +106,7 @@ void pdouble_as_cstring(const double dbl, cstring_pdouble_t * out_p)
     {
         naive_ultoa_padded17(magic.l, p);
 
+        /* find the first non-'0' digit */
         char * wp = p + 1;
         size_t ix = 0;
         for (ix = 0; ix < 6; ++ix, ++wp)
@@ -106,15 +116,19 @@ void pdouble_as_cstring(const double dbl, cstring_pdouble_t * out_p)
                 break;
             }
         }
+        /* move on back of there was none */
         wp -= (ix == 6);
         ix -= (ix == 6);
 
+        /* move the leading digits to the left */
         while (ix != 6)
         {
             *p++ = *wp++;
             ++ix;
         }
+        /* place the decimal separator */
         *p++ = '.';
+        /* And follow with the remaining digits */
         if (LIKELY(p != wp))
         {
             for (ix = 0; ix < 10; ++ix)

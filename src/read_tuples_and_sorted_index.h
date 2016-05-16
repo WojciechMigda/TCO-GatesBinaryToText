@@ -7,7 +7,7 @@
  * Filename: read_tuples_and_sorted_index.h
  *
  * Description:
- *      description
+ *      Read variables and sorted index/score pairs
  *
  * Authors:
  *          Wojciech Migda (wm)

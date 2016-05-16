@@ -7,7 +7,7 @@
  * Filename: span_indexed_score.h
  *
  * Description:
- *      description
+ *      Definition of span of indexed scores
  *
  * Authors:
  *          Wojciech Migda (wm)

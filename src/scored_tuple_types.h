@@ -7,7 +7,7 @@
  * Filename: scored_tuple_types.h
  *
  * Description:
- *      description
+ *      Generation of tuple structures for different tuple dimensions
  *
  * Authors:
  *          Wojciech Migda (wm)

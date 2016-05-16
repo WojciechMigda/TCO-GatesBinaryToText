@@ -7,7 +7,7 @@
  * Filename: work.c
  *
  * Description:
- *      description
+ *      Top-level worker, manages data reading and procesing.
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -145,6 +145,10 @@ void * thread_out4(void * p)
 }
 
 
+/*
+ * Worker function, first it reads in sorted data, then dispatched work
+ * to threads which wrap around functions which output specific text files
+ */
 int work(const struct program_options_s * program_options_p)
 {
     const data_context_t data_ctx = read_data_context(program_options_p->in_file1);

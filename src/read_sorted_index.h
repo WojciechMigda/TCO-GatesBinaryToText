@@ -7,7 +7,7 @@
  * Filename: read_sorted_index.h
  *
  * Description:
- *      description
+ *      Read sorted tuple and score data
  *
  * Authors:
  *          Wojciech Migda (wm)

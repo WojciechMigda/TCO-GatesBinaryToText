@@ -7,7 +7,7 @@
  * Filename: str_concat.h
  *
  * Description:
- *      description
+ *      Macros for string literal concatenation
  *
  * Authors:
  *          Wojciech Migda (wm)

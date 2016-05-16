@@ -7,7 +7,7 @@
  * Filename: span_deque.h
  *
  * Description:
- *      description
+ *      Definition for span of deques
  *
  * Authors:
  *          Wojciech Migda (wm)

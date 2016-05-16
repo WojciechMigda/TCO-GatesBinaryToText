@@ -7,7 +7,7 @@
  * Filename: span_var.h
  *
  * Description:
- *      description
+ *      Definition of span of variables
  *
  * Authors:
  *          Wojciech Migda (wm)

@@ -7,7 +7,8 @@
  * Filename: read_tuples_and_scored_index.c
  *
  * Description:
- *      description
+ *      Read batch of tuples (variables and scores), dissociate variables
+ *      from scores, merge scores with tuples indices
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -35,6 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/*
+ * These functions are specificaly generated for given tuple dimension
+ */
 
 #define TUPLE_DIM 2
 #include "read_tuples_and_scored_index_sub_gen.h"
@@ -80,7 +84,20 @@ const read_tuples_and_scored_index_sub_t read_tuples_and_scored_index_sub[] =
     read_tuples_and_scored_index_sub_d8,
 };
 
-
+/*
+ * Read batch of tuples
+ *
+ * Sorted tuple-index/score pairs are returned in return value, while
+ * variables are placed into passed continuous placeholder (by pointer).
+ *
+ * fname - inpit file name
+ * tup_dim - tuple dimension
+ * begin - starting tuple index
+ * end - index of tuple after the last one
+ * vspan - span defining placeholder for variable data
+ * sum_sq - pointer to the output variable for collection of sum of squared score deviations
+ * mean - reference mean tuple score
+ */
 SPAN_T(indexed_score_t)
 read_tuples_and_scored_index_batch(
     const char * fname,

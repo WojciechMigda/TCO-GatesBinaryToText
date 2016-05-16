@@ -7,7 +7,8 @@
  * Filename: sort_indexed_scores.c
  *
  * Description:
- *      description
+ *      Sorting of pairs of tuple-index/score array, sorting is done over
+ *      score, descending
  *
  * Authors:
  *          Wojciech Migda (wm)

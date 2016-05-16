@@ -20,6 +20,7 @@ int main(int argc, char const * argv[])
 {
     PAIR(int, program_options_t) program_options_ret = parse_program_options(argc, argv);
 
+    /* check status code */
     if (program_options_ret.first < 0)
     {
         return 1;

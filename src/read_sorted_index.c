@@ -7,7 +7,7 @@
  * Filename: read_sorted_index.c
  *
  * Description:
- *      description
+ *      Read sorted tuple and score data
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -197,6 +197,22 @@ SPAN(indexed_score_t) read_sorted_index(
 
 DEFINE_PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t));
 
+/*
+ * top-level function to read in tuples and sorted scored indices
+ *
+ * fname - name of the input file
+ * ntuples - number of tuples
+ * tup_dim - tuple dimension
+ * nthreads - number of threads to use
+ * mean - mean tuple score for sum of squared deviations calculation
+ * sum_sq - output variable for sum of squared deviations
+ *
+ * Reading and sorting are done separately, once batch is read into memory
+ * it is passed to a thread which does sorting. Only the last batch is sorted
+ * directly. Batches are then merges - I use regular qsort for that
+ * (inefficient) which should be replaced with some k-way merge for better
+ * performance.
+ */
 PAIR(SPAN_T(var_t), SPAN_T(indexed_score_t))
 read_tuples_and_sorted_index(
     const char * fname,

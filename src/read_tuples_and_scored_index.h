@@ -7,7 +7,8 @@
  * Filename: read_tuples_and_scored_index.h
  *
  * Description:
- *      description
+ *      Read batch of tuples (variables and scores), dissociate variables
+ *      from scores, merge scores with tuples indices
  *
  * Authors:
  *          Wojciech Migda (wm)

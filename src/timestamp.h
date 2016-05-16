@@ -7,7 +7,7 @@
  * Filename: timestamp.h
  *
  * Description:
- *      description
+ *      Retrieval of current time (in msec)
  *
  * Authors:
  *          Wojciech Migda (wm)

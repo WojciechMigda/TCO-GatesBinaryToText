@@ -7,7 +7,7 @@
  * Filename: score_as_cstring.h
  *
  * Description:
- *      description
+ *      Convert score (double float in range [-1.0, 1.0] to an ascii string
  *
  * Authors:
  *          Wojciech Migda (wm)
@@ -40,6 +40,10 @@ extern "C"
 #endif
 
 
+/*
+ * Naive signed 64-bit integer conversion to a left '0'-padded ascii string
+ * of width of 12 characters
+ */
 static inline
 size_t naive_ltoa_padded12(int64_t v, char * p)
 {
@@ -88,6 +92,10 @@ size_t naive_ltoa_padded12(int64_t v, char * p)
 }
 
 
+/*
+ * Convert score (double float in range [-1.0, 1.0] to an ascii string.
+ * Result is placed through out_p pointer
+ */
 static inline
 void score_as_cstring(const double score, cstring_score_t * out_p)
 {
