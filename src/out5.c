@@ -30,8 +30,8 @@
 #include "timestamp.h"
 #include "cstring_score.h"
 #include "score_as_cstring.h"
-//#include "cstring_double.h"
-//#include "double_as_cstring.h"
+#include "cstring_pdouble.h"
+#include "pdouble_as_cstring.h"
 #include "cstring_uint32.h"
 #include "naive_utoa.h"
 
@@ -43,6 +43,16 @@
 //#define USE_PRINTF
 
 
+/*
+ * optimized function which outputs scored tuple with distance
+ *
+ * DIM - tuple dimension
+ * ofile - output stream
+ * base_p - array of variables
+ * tix - index of tuple
+ * alpha_score_p - pointer to ascii representation of tuple score
+ * dist - tuple score distance from mean
+ */
 static inline
 void fast_out_scored_tuple(
     const size_t DIM,
@@ -68,12 +78,53 @@ void fast_out_scored_tuple(
     p -= (*alpha_score_p != '-');
 
     *p++ = '\t';
-    *p = 0;
 
-    fputs(buf, ofile);
-    fprintf(ofile, "%.10lf\n", dist);
+    if (UNLIKELY(dist > MAX_PDOUBLE))
+    {
+        /* case which cannot be handled by pdouble_as_cstring */
+        *p = 0;
+
+        fputs(buf, ofile);
+        fprintf(ofile, "%.10lf\n", dist);
+    }
+    else
+    {
+        if (LIKELY(dist < 1.0))
+        {
+            /* we'll reuse score conversion function for dist smaller than 1.0 */
+            cstring_score_t cstr;
+            score_as_cstring(dist, &cstr);
+
+            /* append the string */
+            memcpy(p, &cstr[0], sizeof (cstr));
+
+            p[12] = '\n';
+            p[13] = 0;
+            fputs(buf, ofile);
+        }
+        else
+        {
+            /* default conversion for positive double float */
+            cstring_pdouble_t cstr;
+            pdouble_as_cstring(dist, &cstr);
+
+            /* append the string */
+            memcpy(p, &cstr[0], sizeof (cstr));
+
+            /* find terminating position after the least number of digits */
+            char * wp = memchr(p + 12, 0x00, 7);
+            *wp++ = '\n';
+            *wp = 0;
+            fputs(buf, ofile);
+        }
+    }
 }
 
+
+/*
+ * functions to output lines with scored tuples + distance tailored for
+ * specific tuple sizes
+ */
 
 static
 void out_scored_tuple2(
@@ -278,23 +329,10 @@ out_scored_tuple_fn out_scored_tuple_fns[] =
 };
 
 
-//#include <string.h>
-//static
-//double std(SPAN(indexed_score_t) indexed_scores, const double mean)
-//{
-//    size_t ix = 0;
-//    double sum = 0.;
-//
-//    for (ix = 0; ix < indexed_scores.sz; ++ix)
-//    {
-//        const double delta = indexed_scores.ptr[ix].second - mean;
-//        sum += (delta * delta);
-//    }
-//
-//    return sqrt(sum / (indexed_scores.sz - 0));
-//}
 
-
+/*
+ * compute contents and output out5.txt file
+ */
 void out5(
     SPAN(indexed_score_t) indexed_scores,
     SPAN(var_t) tuples,
