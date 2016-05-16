@@ -14,6 +14,7 @@ When cmake is used it builds few testing executables in additions to the run exe
   naive_utoa_test - tests correctness of uint32 to ascii conversion
   cstring_score_test - tests correctness of double precision floating value [-1,1] to ascii conversion
   deque_test - tests "deque", or maybe rather single-linked list used to keep value-to-sorted-tuple-index associations
+  cstring_pdouble_test - tests conversion of positive double precision double floating point values
 
 THREADING:
 

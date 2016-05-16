@@ -30,6 +30,8 @@ extern "C"
 {
 #endif
 
+static const double MAX_PDOUBLE = 100000.;
+
 typedef char (cstring_pdouble_t)[sizeof ("123456.0123456789")];
 
 #ifdef __cplusplus

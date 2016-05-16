@@ -51,6 +51,7 @@ add_executable( utoa_test src/utoa_test.c )
 add_executable( deque_test src/deque_test.c src/deque.c )
 
 add_executable( cstring_score_test src/cstring_score_test.c )
+add_executable( cstring_pdouble_test src/cstring_pdouble_test.c )
 
 add_executable( naive_utoa_test src/naive_utoa_test.c )
 
